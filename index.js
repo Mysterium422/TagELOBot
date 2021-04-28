@@ -2,10 +2,55 @@ const Discord = require('discord.js'), client = new Discord.Client();
 const yaml = require('js-yaml')
 const fs = require('fs')
 const db = require('quick.db')
+const { pConversion } = require('./conversion.js')
 
 let config = yaml.loadAll(fs.readFileSync('config.yaml', 'utf8'))[0]
 
 const prefix = "="
+const k = 40;
+
+async function executeGame(winnerID, loserID) {
+    winnerRating = await db.get(`data.${winnerID}.rating`)
+    loserRating = await db.get(`data.${loserID}.rating`)
+
+    expectedWinner = 1/(1+Math.pow(10, (loserRating - winnerRating)/400))
+    expectedLoser = 1/(1+Math.pow(10, (winnerRating - loserRating)/400))
+
+    winnerNewRating = Math.round(winnerRating + k * (1 - expectedWinner))
+    loserNewRating = Math.round(loserRating + k * (0 - expectedLoser))
+
+    winnerPerformance = await db.get(`data.${winnerID}.performance.opponents`)
+    winnerPerformance.push(loserID)
+    await db.set(`data.${winnerID}.performance.opponents`, winnerPerformance)
+    await db.set(`data.${winnerID}.performance.wins`, await db.get(`data.${winnerID}.performance.wins`) + 1)
+
+    loserPerformance = await db.get(`data.${loserID}.performance.opponents`)
+    loserPerformance.push(winnerID)
+    await db.set(`data.${loserID}.performance.opponents`, loserPerformance)
+    await db.set(`data.${loserID}.performance.losses`, await db.get(`data.${loserID}.performance.losses`) + 1)
+
+    return `**Game Results**
+Winner: <@!${winnerID}> (${winnerRating} --> ${winnerNewRating})
+Loser: <@!${loserID}> (${loserRating} --> ${loserNewRating})`
+}
+
+async function calculatePerformance(ID) {
+    let wins = await db.get(`data.${ID}.performance.wins`)
+    let losses = await db.get(`data.${ID}.performance.losses`)
+    if (wins + losses < 10) return "10 or more games needed"
+
+    let opponents = await db.get(`data.${ID}.performance.opponents`)
+    let opponentRatingSum = 0;
+
+    for (let i = 0; i < opponents.length; i++) {
+        opponentRatingSum = opponentRatingSum + await db.get(`data.${opponents[i]}.rating`)
+    }
+    winPercentage = wins/(wins+losses)
+    dP = pConversion[winPercentage]
+    averageRating = opponentRatingSum/(wins+losses)
+
+    return averageRating + dP
+}
 
 client.on('ready', () => {
     console.log("Bot: Tag ELO Bot is online!")
@@ -63,6 +108,7 @@ client.on('message', async (m) => {
         m.channel.send("Removed you from the queue")
     }
     else if (command == "abort") {
+        if (!m.author.id in tagEloGames) return m.channel.send("You are not in a game")
         const msg = await m.channel.send(`<@!${m.author.id}> <@!${tagEloGames[m.author.id]}> React with a :thumbsup: if you consent to aborting the game`)
 
         msg.react('👍')
@@ -90,6 +136,49 @@ client.on('message', async (m) => {
                 return msg.edit("Game abortion failed. You may have to =resign")
             }
         })
+    }
+    else if (command == "resign" || command == "forfeit" || command == "winner") {
+        if (!m.author.id in tagEloGames) return m.channel.send("You are not in a game")
+        const msg = await m.channel.send(`React with a :thumbsup: if you consent that <@!${tagEloGames[m.author.id]}> beat <@!${m.author.id}>`)
+
+        const filter = (reaction, user) => (user.id === m.author.id || user.id === tagEloGames[m.author.id])
+        const collector = msg.createReactionCollector(filter, {time: 10000})
+
+        msg.react('👍').then(msg.react('👎'))
+
+        let eSignatures = {}
+
+        collector.on('collect', async (reaction, user) => {
+            if (reaction.emoji.name == "👍") {
+                eSignatures[m.author.id] = true
+            }
+            else if (reaction.emoji.name == "👎") {
+                eSignatures[m.author.id] = false
+            }
+
+            if (Object.keys(eSignatures).length == 2) {
+                collector.stop()
+            }
+        })
+
+        collector.on('end', () => {
+            if (eSignatures[m.author.id] && eSignatures[tagEloGames[m.author.id]]) {
+                let string = await executeGame(tagEloGames[m.author.id], m.author.id)
+                delete tagEloGames[tagEloGames[m.author.id]]
+                delete tagEloGames[m.author.id]
+                return msg.edit(string)
+            }
+            else {
+                return msg.edit("Game end failed. <@&752177298161008763>")
+            }
+        })
+    }
+    else if (command == "stats") {
+        return m.channel.send(`
+Rating: ${await db.get(`data.${m.author.id}.rating`)}
+Wins: ${await db.get(`data.${m.author.id}.performace.wins`)}
+Losses: ${await db.get(`data.${m.author.id}.performace.losses`)}
+Estimated Performance: ${await calculatePerformance(m.author.id)}`)
     }
 })
 
