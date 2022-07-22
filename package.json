@@ -7,5 +7,10 @@
     "start": "node index.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord-buttons": "^3.1.1",
+    "mongoose": "^5.12.13",
+    "namemc": "^1.8.8"
+  }
 }
