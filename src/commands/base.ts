@@ -8,8 +8,7 @@ export default {
 		if (
 			message.channel.id != config.mainChannelID &&
 			message.channel.id != config.queueChannelID &&
-			message.channel.id != config.commandsChannelID &&
-			message.channel.id != config.registerChannelID
+			message.channel.id != config.commandsChannelID
 		) {
 			return
 		}

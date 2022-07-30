@@ -10,6 +10,8 @@ function newMojangQuery() {
 	}, 10 * 60 * 1000)
 }
 
+export let locked = false
+
 export enum Staff {
 	MYSTERIUM,
 	ADMINISTRATOR,
