@@ -2,6 +2,14 @@ import Discord, { MessageEmbed, MessageOptions } from "discord.js"
 import config from "./config"
 import fs from "fs"
 
+let mojangQueries = 0
+function newMojangQuery() {
+	mojangQueries = mojangQueries + 1
+	setTimeout(function () {
+		mojangQueries = mojangQueries - 1
+	}, 10 * 60 * 1000)
+}
+
 export enum Staff {
 	MYSTERIUM,
 	ADMINISTRATOR,
@@ -92,4 +100,63 @@ export function addAudit(text: string) {
 	// 17 Aug 2015 14:05:30 >>
 	auditLog = `${auditLog}\n${timeConverter(Date.now())} >> ${text}`
 	fs.writeFileSync("audit.txt", auditLog)
+}
+
+export type HypixelResponsePlayerData = {
+	uuid: string
+	displayname: string
+	networkExp?: number
+	firstLogin: number
+	stats: { TNTGames: { [key: string]: number } }
+	socialMedia?: { links?: { DISCORD?: string } }
+}
+
+export type HypixelResponse =
+	| { success: false; cause: string }
+	| { success: true; player: HypixelResponsePlayerData }
+
+/** Query the Hypixel API */
+export async function hypixelFetch(query: string): Promise<HypixelResponse | null> {
+	const response = await fetch(
+		`https://api.hypixel.net/${query}&key=${config.hypixel_key}`
+	)
+	if (response.status === 403 || response.status === 200) {
+		try {
+			return (await response.json()) as HypixelResponse
+		} catch (e) {
+			console.warn("[WARNING] Error while reading JSON:", e)
+			return null
+		}
+	} else {
+		return null
+	}
+}
+
+type MojangResponse = { name: string; id: string }
+
+export async function mojangUUIDFetch(query: string): Promise<MojangResponse> {
+	if (mojangQueries > 599) {
+		return { name: query, id: query }
+	}
+	newMojangQuery()
+
+	const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${query}`)
+
+	if (response.status === 403 || response.status === 200) {
+		try {
+			return await response.json()
+		} catch (e) {
+			console.warn("[WARNING] Error while reading JSON:", e)
+		}
+	}
+
+	return { name: query, id: query }
+}
+
+export function replaceError(a: any, defaultVar: any): any {
+	if (a == undefined || a == Infinity) {
+		return defaultVar
+	} else {
+		return a
+	}
 }
