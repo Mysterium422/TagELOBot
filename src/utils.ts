@@ -162,3 +162,7 @@ export function replaceError(a: any, defaultVar: any): any {
 		return a
 	}
 }
+
+export function consolelog(text: string) {
+	console.log(`[TAG ELO] ${text}`)
+}
