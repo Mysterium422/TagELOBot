@@ -14,3 +14,4 @@ json 3.sqlite
 ignore
 mongoose.js
 mongotest.js
+static/createSupportMessage.ts

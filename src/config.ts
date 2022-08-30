@@ -4,6 +4,7 @@ import { resolve } from "path"
 const CONFIG_PATH = resolve(__dirname, "../config.json")
 const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly prefix: string
+	readonly token: string
 	readonly ownerID: string
 	readonly staffRoleID: string
 	readonly hostRoleID: string
@@ -16,6 +17,7 @@ const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly commandsChannelID: string
 	readonly registerChannelID: string
 	readonly queueChannelID: string
+	readonly queueMessageID: string
 	readonly dmsChannelID: string
 	readonly hypixel_key: string
 	readonly mongoConnectionMain: string
