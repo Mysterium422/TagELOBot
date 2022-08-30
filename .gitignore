@@ -8,3 +8,10 @@ config.json
 .DS_Store
 json 2.sqlite
 src/config.ts
+configg.json
+conversion.js
+index.js
+json 3.sqlite
+ignore
+mongoose.js
+mongotest.js
