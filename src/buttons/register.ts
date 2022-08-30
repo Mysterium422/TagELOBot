@@ -3,6 +3,7 @@ import Discord from "discord.js"
 import config from "../config"
 import { addAudit } from "../utils"
 import * as db from "../db"
+import * as mongo from "../mongo"
 
 export default {
 	run: async ({ button }: ButtonParameters) => {
@@ -55,19 +56,16 @@ export default {
 
 			await db.add(db.TABLES.UserData, { discord: args[2], name: args[3], uuid: args[4] })
 
-			// TODO: Mongo
-
-			// let profile = await mongoUtils.create({
-			// 	userID: args[2],
-			// 	elo: 1000,
-			// 	username: args[3],
-			// 	uuid: args[4],
-			// 	wins: 0,
-			// 	losses: 0,
-			// 	records: [],
-			// 	deviation: 100
-			// })
-			// profile.save()
+			mongo.create(mongo.MODELS.Users, {
+				userID: args[2],
+				elo: 1000,
+				username: args[3],
+				uuid: args[4],
+				wins: 0,
+				losses: 0,
+				records: [],
+				deviation: 100
+			})
 
 			return button.channel.send({
 				content: `<@!${args[2]}>`,

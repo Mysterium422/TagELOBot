@@ -1,5 +1,5 @@
-import config from "../config"
-import { consolelog } from "../utils"
+import config from "./config"
+import { consolelog } from "./utils"
 
 const mongoose = require("mongoose")
 
