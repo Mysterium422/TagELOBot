@@ -7,7 +7,6 @@ olderFiles
 config.json
 .DS_Store
 json 2.sqlite
-src/config.ts
 configg.json
 conversion.js
 index.js
