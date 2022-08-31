@@ -8,7 +8,7 @@ import * as db from "../db"
 import * as mongo from "../mongo"
 
 export default {
-	run: async ({ message }: CommandParameters) => {
+	run: async ({ message, client }: CommandParameters) => {
 		if (
 			message.channel.id != config.mainChannelID &&
 			message.channel.id != config.queueChannelID &&

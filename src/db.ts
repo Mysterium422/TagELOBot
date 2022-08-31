@@ -70,7 +70,8 @@ interface RowMap {
 }
 
 /** Get all rows in a table */
-export const all = (table: keyof RowMap) => knex(table)
+export const all = <K extends keyof RowMap>(table: K): RowMap[K][] =>
+	knex(table) as unknown as RowMap[K][]
 
 /** Add a row to a table */
 export const add = <K extends keyof RowMap>(table: K, row: RowMap[K]) => {
