@@ -1,6 +1,6 @@
 import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
-import { hasStaffPermission, Staff } from "../utils"
+import { hasStaffPermission, Staff, addAudit } from "../utils"
 import config from "../config"
 import * as queue from "../handlers/queue"
 import * as games from "../handlers/game"
@@ -18,8 +18,13 @@ export default {
 		}
 
 		if (!message.member) throw new Error("Message member missing")
-		if (!hasStaffPermission(message.member, Staff.MYSTERIUM)) return
-		queue.debugQueue()
-		games.debugGames()
+		addAudit(`${message.author.id} checked audit logs`)
+		if (hasStaffPermission(message.member, Staff.ADMINISTRATOR)) return
+
+		return message.author.send({ files: ["../../audit.txt"] }).catch((err) => {
+			return message.channel.send({
+				content: "Error while sending file (file too large? bot blocked?)"
+			})
+		})
 	}
 }
