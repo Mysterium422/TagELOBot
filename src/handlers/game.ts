@@ -1,32 +1,43 @@
 import { MongoUser } from "../mongo"
 import * as queue from "./queue"
 
-type gameEntry =
-	| {
-			type: "game"
-			player1: {
-				userID: string
-				elo: number
-			}
-			player2: {
-				userID: string
-				elo: number
-			}
-			host: boolean
-	  }
-	| {
-			type: "duel"
-			player1: {
-				userID: string
-				elo: number
-			}
-			player2: {
-				userID: string
-				elo: number
-			}
-	  }
+class Game {
+	public type: "game" | "duel"
+	public player1: {
+		userID: string
+		elo: number
+	}
+	public player2: {
+		userID: string
+		elo: number
+	}
+	public host: boolean
 
-let games: gameEntry[] = []
+	constructor(
+		userID1: string,
+		elo1: number,
+		userID2: string,
+		elo2: number,
+		type: "game" | "duel"
+	) {
+		this.type = type
+		this.player1 = {
+			userID: userID1,
+			elo: elo1
+		}
+		this.player2 = {
+			userID: userID2,
+			elo: elo2
+		}
+		this.host = false
+	}
+
+	public hostRequested() {
+		this.host = true
+	}
+}
+
+let games: Game[] = []
 
 function inGame(playerID: string): boolean {
 	return games.some((entry) => {
@@ -43,18 +54,8 @@ function newGame(userID1: string, elo1: number, userID2: string, elo2: number) {
 		throw new Error("Player is already in a game")
 	}
 
-	games.push({
-		type: "game",
-		player1: {
-			userID: userID1,
-			elo: elo1
-		},
-		player2: {
-			userID: userID2,
-			elo: elo2
-		},
-		host: false
-	})
+	let game = new Game(userID1, elo1, userID2, elo2, "game")
+	games.push(game)
 
 	if (queue.inQueue(userID1)) {
 		queue.leave(userID1)
@@ -65,7 +66,7 @@ function newGame(userID1: string, elo1: number, userID2: string, elo2: number) {
 	}
 }
 
-function findGame(playerID: string): gameEntry | null {
+function findGame(playerID: string): Game | null {
 	for (let i = 0; i < games.length; i++) {
 		if (games[i].player1.userID == playerID) return games[i]
 		if (games[i].player2.userID == playerID) return games[i]
