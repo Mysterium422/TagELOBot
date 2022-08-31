@@ -110,5 +110,6 @@ export default {
 			)
 		addAudit(`${message.author.id} left a game`)
 		return
-	}
+	},
+	aliases: ["l"]
 }

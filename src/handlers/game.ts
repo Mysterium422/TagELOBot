@@ -81,4 +81,17 @@ function findOpponent(playerID: string): string | null {
 	return game.player1.userID
 }
 
-export { inGame, newGame, findGame, findOpponent }
+function deleteGame(playerID: string) {
+	for (let i = 0; i < games.length; i++) {
+		if (games[i].player1.userID == playerID) {
+			games.splice(i, 1)
+			return
+		}
+		if (games[i].player2.userID == playerID) {
+			games.splice(i, 1)
+			return
+		}
+	}
+}
+
+export { inGame, newGame, findGame, findOpponent, deleteGame }
