@@ -11,13 +11,13 @@ const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly guildID: string
 	readonly scannerRoleID: string
 	readonly rankedRoleID: string
+	readonly rankedCategoryID: string
 	readonly scanRoleID: string
 	readonly botDMRoleID: string
 	readonly mainChannelID: string
 	readonly commandsChannelID: string
 	readonly registerChannelID: string
 	readonly queueChannelID: string
-	readonly queueMessageID: string
 	readonly dmsChannelID: string
 	readonly hypixel_key: string
 	readonly mongoConnectionMain: string
