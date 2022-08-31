@@ -8,10 +8,9 @@ type queueEntry = {
 	time: number
 }
 
-let channelID = config.queueChannelID
 let queue: queueEntry[] = []
 
-function join(member: string, data: mongo.MongoUser) {
+export function join(member: string, data: mongo.MongoUser) {
 	if (
 		queue.some((entry) => {
 			return entry.userID == member
@@ -27,7 +26,7 @@ function join(member: string, data: mongo.MongoUser) {
 	})
 }
 
-function leave(member: string) {
+export function leave(member: string) {
 	if (
 		queue.some((entry) => {
 			return entry.userID == member
@@ -39,21 +38,21 @@ function leave(member: string) {
 	}
 }
 
-function inQueue(member: string): boolean {
+export function inQueue(member: string): boolean {
 	return queue.some((entry) => {
 		return entry.userID == member
 	})
 }
 
-function queueSize(): number {
+export function queueSize(): number {
 	return queue.length
 }
 
-function resetQueue() {
+export function resetQueue() {
 	queue = []
 }
 
-function findOpponent(member: string, data: mongo.MongoUser): queueEntry | null {
+export function findOpponent(member: string, data: mongo.MongoUser): queueEntry | null {
 	if (
 		queue.some((entry) => {
 			return entry.userID == member
@@ -74,5 +73,3 @@ function findOpponent(member: string, data: mongo.MongoUser): queueEntry | null 
 	}
 	return null
 }
-
-export { join, leave, inQueue, queueSize, resetQueue, findOpponent }

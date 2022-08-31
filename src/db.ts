@@ -73,7 +73,7 @@ interface RowMap {
 export const all = (table: keyof RowMap) => knex(table)
 
 /** Add a row to a table */
-export const add = <K extends keyof RowMap>(table: K, row: Partial<RowMap[K]>) => {
+export const add = <K extends keyof RowMap>(table: K, row: RowMap[K]) => {
 	return knex(table).insert(row)
 }
 
@@ -88,10 +88,19 @@ export const update = <K extends keyof RowMap>(
 
 /** Fetch all rows which match a query */
 export const where = <K extends keyof RowMap>(
-	table: string,
+	table: K,
 	query: Partial<RowMap[K]>
-) => {
-	return knex(table).where(query)
+): RowMap[K][] => {
+	return knex(table).where(query) as unknown as RowMap[K][]
+}
+
+/** Checks if any row matches a query */
+export const contains = async <K extends keyof RowMap>(
+	table: K,
+	query: Partial<RowMap[K]>
+): Promise<boolean> => {
+	let result = await where(table, query)
+	return result.length > 0
 }
 
 type SelectReturnType<K extends keyof RowMap, C extends (keyof RowMap[K])[]> = Promise<
