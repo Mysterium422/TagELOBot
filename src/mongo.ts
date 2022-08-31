@@ -73,7 +73,7 @@ const models = {
 export const findOne = <K extends keyof MongoMap>(
 	model: K,
 	query: Partial<MongoMap[K]>
-): Promise<MongoMap[K]> => {
+): Promise<MongoMap[K] | null> => {
 	return models[model].findOne(query).toJSON()
 }
 
