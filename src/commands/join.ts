@@ -194,5 +194,6 @@ export default {
 				}> ${player.username} (${Math.round(player.elo)})`)
 			]
 		})
-	}
+	},
+	aliases: ["j"]
 }
