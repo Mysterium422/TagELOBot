@@ -25,7 +25,7 @@ export default {
 				embeds: [
 					new Discord.MessageEmbed()
 						.setColor("NOT_QUITE_BLACK")
-						.setDescription("Ping the player you would like to award elo to")
+						.setDescription("Ping the player who should get the *win*")
 				]
 			})
 		}
@@ -36,7 +36,7 @@ export default {
 				embeds: [
 					new Discord.MessageEmbed()
 						.setColor("NOT_QUITE_BLACK")
-						.setDescription("Ping the player you would like to award elo to")
+						.setDescription("Ping the player who should get the *win*")
 				]
 			})
 		}

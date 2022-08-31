@@ -166,3 +166,7 @@ export function replaceError(a: any, defaultVar: any): any {
 export function consolelog(text: string) {
 	console.log(`[TAG ELO] ${text}`)
 }
+
+export function lockQueue() {
+	locked = true
+}
