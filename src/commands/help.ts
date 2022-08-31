@@ -1,6 +1,5 @@
 import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
-import { hasStaffPermission, Staff } from "../utils"
 import config from "../config"
 
 export default {

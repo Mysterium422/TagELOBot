@@ -2,10 +2,7 @@ import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
 import { addAudit, hasStaffPermission, Staff } from "../utils"
 import config from "../config"
-import * as queue from "../handlers/queue"
-import * as games from "../handlers/game"
 import * as db from "../db"
-import * as mongo from "../mongo"
 
 export default {
 	run: async ({ message, client, args }: CommandParameters) => {
@@ -54,14 +51,6 @@ export default {
 				]
 			})
 		}
-		// let player = (await mongoUtils.findOne({userID:changeID})).toJSON()
-		// player.records.push({
-		//     reason:"admin",
-		//     elo:Math.max(player.elo + eval(args[1]), 0) - player.elo,
-		//     time:Date.now()
-		// })
-		// player.elo = Math.max(player.elo + eval(args[1]), 0)
-		// await mongoUtils.findOneAndReplace({userID:changeID}, player)
 
 		let hostRows = await db.where(db.TABLES.HostData, { discord: changeID })
 		if (hostRows.length == 0) {

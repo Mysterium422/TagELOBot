@@ -1,17 +1,7 @@
-config.yaml
+.DS_Store
 node_modules
-test.js
+
 json.sqlite
 audit.txt
 olderFiles
 config.json
-.DS_Store
-json 2.sqlite
-configg.json
-conversion.js
-index.js
-json 3.sqlite
-ignore
-mongoose.js
-mongotest.js
-static/createSupportMessage.ts

@@ -64,7 +64,8 @@ export default {
 				wins: 0,
 				losses: 0,
 				records: [],
-				deviation: 100
+				deviation: 100,
+				blacklisted: false
 			})
 
 			return button.channel.send({

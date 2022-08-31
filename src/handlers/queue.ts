@@ -1,4 +1,3 @@
-import config from "../config"
 import * as mongo from "../mongo"
 
 type queueEntry = {

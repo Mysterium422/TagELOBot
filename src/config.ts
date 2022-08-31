@@ -21,6 +21,7 @@ const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly dmsChannelID: string
 	readonly hypixel_key: string
 	readonly mongoConnectionMain: string
+	readonly mongoConnection: string
 	readonly mutedRoleID: string
 	readonly k: number
 }

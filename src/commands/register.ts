@@ -2,16 +2,13 @@ import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
 import {
 	addAudit,
-	hasStaffPermission,
 	hypixelFetch,
 	HypixelResponse,
 	mojangUUIDFetch,
 	replaceError,
-	Staff,
 	timeConverter
 } from "../utils"
 import config from "../config"
-import { embedColors } from "../constants"
 import * as db from "../db"
 
 export default {

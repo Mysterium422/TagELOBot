@@ -1,9 +1,7 @@
 import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
-import { addAudit, hasStaffPermission, replaceError, simulateDM, Staff } from "../utils"
+import { addAudit, replaceError, simulateDM } from "../utils"
 import config from "../config"
-import * as queue from "../handlers/queue"
-import * as games from "../handlers/game"
 import * as db from "../db"
 import * as mongo from "../mongo"
 
