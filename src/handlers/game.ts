@@ -1,4 +1,5 @@
-import { MongoUser } from "../mongo"
+import config from "../config"
+import * as mongo from "../mongo"
 import * as queue from "./queue"
 
 class Game {
@@ -93,5 +94,80 @@ function deleteGame(playerID: string) {
 		}
 	}
 }
+type executeGameReturn = {
+	winner: {
+		userID: string
+		oldElo: number
+		newElo: number
+	}
+	loser: {
+		userID: string
+		oldElo: number
+		newElo: number
+	}
+}
 
-export { inGame, newGame, findGame, findOpponent, deleteGame }
+async function executeGame(winnerID: string): Promise<executeGameReturn> {
+	let game = findGame(winnerID)
+	let loserID = findOpponent(winnerID)
+	if (!loserID || !game) throw new Error("Cannot execute a game that doesn't exist")
+
+	let winner = await mongo.findOne(mongo.MODELS.Users, { userID: winnerID })
+	let loser = await mongo.findOne(mongo.MODELS.Users, { userID: loserID })
+
+	let winnerRating = winner.elo
+	let loserRating = loser.elo
+
+	let expectedWinner = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 800))
+
+	let ratingChange = config.k * (1 - expectedWinner)
+	if (game.type == "duel") {
+		ratingChange = ratingChange / 3
+	}
+	ratingChange = Math.round(ratingChange * 100) / 100
+
+	let winnerNewRating = Math.max(winnerRating + ratingChange, 0)
+	let loserNewRating = Math.max(loserRating - ratingChange, 0)
+	let time = Date.now()
+
+	let winnerRecord = {
+		reason: game.type,
+		opponent: loserID,
+		elo: winnerNewRating - winnerRating,
+		time: time
+	}
+	let loserRecord = {
+		reason: game.type,
+		opponent: winnerID,
+		elo: loserNewRating - loserRating,
+		time: time
+	}
+
+	winner.elo = winnerNewRating
+	winner.wins = winner.wins + 1
+	winner.records.push(winnerRecord)
+
+	loser.elo = loserNewRating
+	loser.losses = loser.losses + 1
+	loser.records.push(loserRecord)
+
+	await mongo.findOneAndReplace(mongo.MODELS.Users, { userID: winnerID }, winner)
+	await mongo.findOneAndReplace(mongo.MODELS.Users, { userID: loserID }, loser)
+
+	deleteGame(winnerID)
+
+	return {
+		winner: {
+			userID: winnerID,
+			oldElo: Math.round(winnerRating),
+			newElo: Math.round(winnerNewRating)
+		},
+		loser: {
+			userID: loserID,
+			oldElo: Math.round(loserRating),
+			newElo: Math.round(loserNewRating)
+		}
+	}
+}
+
+export { inGame, newGame, findGame, findOpponent, deleteGame, executeGame }
