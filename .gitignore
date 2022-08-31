@@ -1,7 +1,9 @@
 .DS_Store
 node_modules
 
-json.sqlite
+db.sqlite3
 audit.txt
 olderFiles
 config.json
+config_test.json
+build

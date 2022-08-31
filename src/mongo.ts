@@ -76,7 +76,6 @@ export const findOne = <K extends keyof MongoMap>(
 	model: K,
 	query: Partial<MongoMap[K]>
 ): Promise<MongoMap[K] | null> => {
-	query.blacklisted = false
 	return models[model].findOne(query).toJSON()
 }
 
@@ -85,7 +84,6 @@ export const findOneAndReplace = <K extends keyof MongoMap>(
 	query: Partial<MongoMap[K]>,
 	newvalue: MongoMap[K]
 ) => {
-	query.blacklisted = false
 	return models[model].findOneAndReplace(query, newvalue)
 }
 
@@ -93,7 +91,6 @@ export const find = <K extends keyof MongoMap>(
 	model: K,
 	query: Partial<MongoMap[K]>
 ): Promise<MongoMap[K][]> => {
-	query.blacklisted = false
 	return models[model].find(query)
 }
 

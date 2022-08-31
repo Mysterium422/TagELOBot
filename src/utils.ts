@@ -1,6 +1,10 @@
 import Discord, { MessageEmbed, MessageOptions } from "discord.js"
 import config from "./config"
 import fs from "fs"
+import { resolve } from "path"
+import fetch from "node-fetch"
+
+const AUDIT_PATH = resolve(__dirname, "../audit.txt")
 
 let mojangQueries = 0
 function newMojangQuery() {
@@ -98,7 +102,7 @@ export function timeConverter(UNIX_timestamp: number): string {
 }
 
 export function addAudit(text: string) {
-	let auditLog = fs.readFileSync("../audit.txt", "utf-8")
+	let auditLog = fs.readFileSync(AUDIT_PATH, "utf-8")
 	// 17 Aug 2015 14:05:30 >>
 	auditLog = `${auditLog}\n${timeConverter(Date.now())} >> ${text}`
 	fs.writeFileSync("audit.txt", auditLog)
@@ -146,7 +150,7 @@ export async function mojangUUIDFetch(query: string): Promise<MojangResponse> {
 
 	if (response.status === 403 || response.status === 200) {
 		try {
-			return await response.json()
+			return (await response.json()) as MojangResponse
 		} catch (e) {
 			console.warn("[WARNING] Error while reading JSON:", e)
 		}

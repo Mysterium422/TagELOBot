@@ -6,13 +6,14 @@ import {
 	HypixelResponse,
 	mojangUUIDFetch,
 	replaceError,
+	simulateDM,
 	timeConverter
 } from "../utils"
 import config from "../config"
 import * as db from "../db"
 
 export default {
-	run: async ({ message, args }: CommandParameters) => {
+	run: async ({ message, client, args }: CommandParameters) => {
 		if (
 			message.channel.id != config.mainChannelID &&
 			message.channel.id != config.queueChannelID &&
@@ -27,20 +28,28 @@ export default {
 				message.delete()
 			}, 200)
 
-			return message.author.send({
-				embeds: [
-					new Discord.MessageEmbed()
-						.setColor("NOT_QUITE_BLACK")
-						.setDescription(`That command goes in <#${config.registerChannelID}>`)
-				]
-			})
+			return message.author
+				.send({
+					embeds: [
+						new Discord.MessageEmbed()
+							.setColor("NOT_QUITE_BLACK")
+							.setDescription(`That command goes in <#${config.registerChannelID}>`)
+					]
+				})
+				.catch((err) => {
+					simulateDM(
+						message,
+						new Discord.MessageEmbed()
+							.setColor("NOT_QUITE_BLACK")
+							.setDescription(`That command goes in <#${config.registerChannelID}>`),
+						client
+					)
+				})
 		}
 
 		addAudit(`${message.author.id} tried to register with IGN: ${args[0]}`)
 
-		if (
-			(await db.where(db.TABLES.UserData, { discord: message.author.id })).length == 0
-		) {
+		if (await db.contains(db.TABLES.UserData, { discord: message.author.id })) {
 			return message.channel.send({
 				embeds: [
 					new Discord.MessageEmbed()
@@ -91,7 +100,7 @@ export default {
 			})
 		}
 
-		let messageSent = await message.channel.send({
+		await message.channel.send({
 			components: [
 				new Discord.MessageActionRow().addComponents([
 					new Discord.MessageButton()

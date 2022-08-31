@@ -3,8 +3,9 @@ import { readdirSync } from "fs"
 import { resolve } from "path"
 
 import config from "./config"
-import { consolelog } from "./utils"
+import { addAudit, consolelog } from "./utils"
 import * as db from "./db"
+import * as mongo from "./mongo"
 
 const client = new Client({
 	intents: [
@@ -28,6 +29,7 @@ let isReady = false
 
 client.on("ready", async () => {
 	consolelog("[START] Initiliazing Bot")
+	addAudit("Starting Bot")
 
 	try {
 		consolelog("[START] Loading database...")
@@ -46,9 +48,11 @@ client.on("ready", async () => {
 		for (const fileName of commandFiles) {
 			const command = (await import("./Commands/" + fileName)).default
 			Commands[fileName.slice(0, -3)] = command
-			command.aliases.forEach((name) => {
-				Commands[name] = command
-			})
+			if (command.aliases) {
+				command.aliases.forEach((name) => {
+					Commands[name] = command
+				})
+			}
 		}
 	} catch (e) {
 		console.error("[TAG ELO] Error: Failed to load Commands")
@@ -72,6 +76,8 @@ client.on("ready", async () => {
 		console.error("[TAG ELO] [ERROR] Failed to load buttons! Aborting...")
 		throw e
 	}
+
+	console.log(await db.all(db.TABLES.UserData))
 
 	isReady = true
 })
@@ -97,22 +103,6 @@ client.on("messageCreate", async (message) => {
 		}
 	} catch (e) {
 		console.log(e)
-	}
-
-	try {
-		consolelog("[START] Loading buttons")
-		const file_path = resolve(__dirname, "./buttons")
-		const buttonFiles = readdirSync(file_path).filter((file) => file.endsWith(".js"))
-
-		for (const fileName of buttonFiles) {
-			const button = (await import("./buttons/" + fileName)).default
-			buttons[fileName.slice(0, -3)] = button
-		}
-
-		consolelog("[START] Buttons loaded")
-	} catch (e) {
-		console.error("[TAG ELO] [ERROR] Failed to load buttons! Aborting...")
-		throw e
 	}
 })
 
