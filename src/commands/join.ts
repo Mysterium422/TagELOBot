@@ -116,6 +116,7 @@ export default {
 		addAudit(`${message.author.id} successfully joined`)
 
 		let player = await mongo.findOne(mongo.MODELS.Users, { userID: message.author.id })
+		if (!player) throw new Error("Mongo player not found")
 
 		let opponent = queue.findOpponent(player.userID, player)
 		if (!opponent) {
@@ -151,7 +152,7 @@ export default {
 				})
 		}
 
-		games.newGame(player.userID, player.elo, opponent.userID, opponent.elo)
+		games.newGame(player.userID, opponent.userID)
 
 		message.channel.send({
 			embeds: [
@@ -183,6 +184,7 @@ export default {
 		let opponentData = await mongo.findOne(mongo.MODELS.Users, {
 			userID: opponent.userID
 		})
+		if (!opponentData) throw new Error("Mongo player not found")
 
 		return message.channel.send({
 			content: `<@!${message.author.id}> <@!${opponent.userID}>`,

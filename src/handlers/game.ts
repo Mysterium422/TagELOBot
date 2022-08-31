@@ -6,29 +6,19 @@ class Game {
 	public type: "game" | "duel"
 	public player1: {
 		userID: string
-		elo: number
 	}
 	public player2: {
 		userID: string
-		elo: number
 	}
 	public host: boolean
 
-	constructor(
-		userID1: string,
-		elo1: number,
-		userID2: string,
-		elo2: number,
-		type: "game" | "duel"
-	) {
+	constructor(userID1: string, userID2: string, type: "game" | "duel") {
 		this.type = type
 		this.player1 = {
-			userID: userID1,
-			elo: elo1
+			userID: userID1
 		}
 		this.player2 = {
-			userID: userID2,
-			elo: elo2
+			userID: userID2
 		}
 		this.host = false
 	}
@@ -46,7 +36,7 @@ function inGame(playerID: string): boolean {
 	})
 }
 
-function newGame(userID1: string, elo1: number, userID2: string, elo2: number) {
+function newGame(userID1: string, userID2: string) {
 	if (
 		games.some((entry) => {
 			return inGame(userID1) || inGame(userID2)
@@ -55,7 +45,7 @@ function newGame(userID1: string, elo1: number, userID2: string, elo2: number) {
 		throw new Error("Player is already in a game")
 	}
 
-	let game = new Game(userID1, elo1, userID2, elo2, "game")
+	let game = new Game(userID1, userID2, "game")
 	games.push(game)
 
 	if (queue.inQueue(userID1)) {
@@ -114,6 +104,9 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 
 	let winner = await mongo.findOne(mongo.MODELS.Users, { userID: winnerID })
 	let loser = await mongo.findOne(mongo.MODELS.Users, { userID: loserID })
+
+	if (!winner) throw new Error("Winner Mongo Data not found")
+	if (!loser) throw new Error("Loser Mongo Data not found")
 
 	let winnerRating = winner.elo
 	let loserRating = loser.elo
