@@ -163,4 +163,10 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 	}
 }
 
+export function debugGames() {
+	for (let i = 0; i < games.length; i++) {
+		console.log(games[i])
+	}
+}
+
 export { inGame, newGame, findGame, findOpponent, deleteGame, executeGame }

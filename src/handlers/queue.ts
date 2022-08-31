@@ -73,3 +73,7 @@ export function findOpponent(member: string, data: mongo.MongoUser): queueEntry 
 	}
 	return null
 }
+
+export function debugQueue() {
+	console.log(queue)
+}
