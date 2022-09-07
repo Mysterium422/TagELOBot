@@ -31,7 +31,7 @@ export default {
 				})
 				.catch((err) =>
 					simulateDM(
-						message,
+						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
 							.setDescription(`That command goes in <#${config.queueChannelID}>`),
@@ -65,7 +65,7 @@ export default {
 				})
 				.catch((err) =>
 					simulateDM(
-						message,
+						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
 							.setDescription("You are already queued"),
@@ -88,7 +88,7 @@ export default {
 				})
 				.catch((err) =>
 					simulateDM(
-						message,
+						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
 							.setDescription(
@@ -143,7 +143,7 @@ export default {
 				})
 				.catch((err) => {
 					simulateDM(
-						message,
+						message.member,
 						new Discord.MessageEmbed()
 							.setColor("GREEN")
 							.setDescription("Added you to the queue!"),

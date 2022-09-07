@@ -7,7 +7,7 @@ import * as queue from "../handlers/queue"
 import * as games from "../handlers/game"
 
 export default {
-	run: async ({ button }: ButtonParameters) => {
+	run: async ({ button, client }: ButtonParameters) => {
 		if (button.message.id != config.queueMessageID) {
 			return
 		}
@@ -60,25 +60,24 @@ export default {
 		// 			)
 		// 	]
 		// })
-		button.member.send({
-			embeds: [
-				new Discord.MessageEmbed()
-					.setColor("RED")
-					.setDescription("Removed you from the queue")
-			]
-		})
+		button.member
+			.send({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("RED")
+						.setDescription("Removed you from the queue")
+				]
+			})
+			.catch((err) =>
+				simulateDM(
+					button.member as GuildMember,
+					new Discord.MessageEmbed()
+						.setColor("RED")
+						.setDescription("Removed you from the queue"),
+					client
+				)
+			)
 
-		// TODO: Make catch work
-
-		// .catch((err) =>
-		// 	simulateDM(
-		// 		message,
-		// 		new Discord.MessageEmbed()
-		// 			.setColor("RED")
-		// 			.setDescription("Removed you from the queue"),
-		// 		client
-		// 	)
-		// )
 		addAudit(`${button.member.id} left a game`)
 		return
 	},

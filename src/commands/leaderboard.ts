@@ -31,7 +31,7 @@ export default {
 				})
 				.catch((err) =>
 					simulateDM(
-						message,
+						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
 							.setDescription(`That command goes in <#${config.mainChannelID}>`),

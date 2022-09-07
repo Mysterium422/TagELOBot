@@ -9,7 +9,7 @@ import * as mongo from "../mongo"
 import Discord from "discord.js"
 
 export default {
-	run: async ({ button }: ButtonParameters) => {
+	run: async ({ button, client }: ButtonParameters) => {
 		if (button.message.id != config.queueMessageID) {
 			return
 		}
@@ -94,25 +94,23 @@ export default {
 			// 	]
 			// })
 
-			return button.member.send({
-				embeds: [
-					new Discord.MessageEmbed()
-						.setColor("GREEN")
-						.setDescription("Added you to the queue!")
-				]
-			})
-
-			// TODO: FIX THE CATCH
-
-			// .catch((err) => {
-			// 	simulateDM(
-			// 		message,
-			// 		new Discord.MessageEmbed()
-			// 			.setColor("GREEN")
-			// 			.setDescription("Added you to the queue!"),
-			// 		client
-			// 	)
-			// })
+			return button.member
+				.send({
+					embeds: [
+						new Discord.MessageEmbed()
+							.setColor("GREEN")
+							.setDescription("Added you to the queue!")
+					]
+				})
+				.catch((err) => {
+					simulateDM(
+						button.member as GuildMember,
+						new Discord.MessageEmbed()
+							.setColor("GREEN")
+							.setDescription("Added you to the queue!"),
+						client
+					)
+				})
 		}
 
 		games.newGame(player.userID, opponent.userID)

@@ -37,30 +37,29 @@ export function hasStaffPermission(
 }
 
 export async function simulateDM(
-	message: Discord.Message,
+	member: Discord.GuildMember | null,
 	embedToSend: MessageEmbed,
 	client: Discord.Client
 ) {
 	let guild = await client.guilds.cache.get(config.guildID)
 	if (!guild) throw new Error("Cannot find Guild ID")
-	if (!message.member) throw new Error("Cannot find Message Member")
+	if (!member) throw new Error("Cannot find Message Member")
 
 	let role = await guild.roles.cache.get(config.botDMRoleID)
 	if (!role) throw new Error("Cannot find botDM Role ID")
-	await message.member.roles.add(role)
+	await member.roles.add(role)
 
 	let channel = await client.channels.cache.get(config.dmsChannelID)
 	if (!channel) throw new Error("Cannot find DM Channel ID")
 	if (channel.type != "GUILD_TEXT") throw new Error("Cannot find DM Channel ID")
 
 	let msg = await channel.send({
-		content: `<@!${message.author.id}>`,
+		content: `<@!${member.id}>`,
 		embeds: [embedToSend]
 	})
 
 	await msg.react("✅")
-	const filter = (reaction, user) =>
-		user.id === message.author.id && reaction.emoji.name == "✅"
+	const filter = (reaction, user) => user.id === member.id && reaction.emoji.name == "✅"
 	const collector = msg.createReactionCollector({ time: 30 * 1000, filter })
 
 	collector.on("collect", async () => {
@@ -69,9 +68,8 @@ export async function simulateDM(
 
 	collector.on("end", () => {
 		msg.delete()
-		if (!message.member) return
 		if (!role) return
-		message.member.roles.remove(role)
+		member.roles.remove(role)
 	})
 }
 
