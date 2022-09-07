@@ -7,5 +7,6 @@ olderFiles
 config.json
 config_test.json
 build
+mongotest.js
 
 src/static/createQueueMessage.ts
