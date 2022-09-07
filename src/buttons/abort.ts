@@ -1,5 +1,5 @@
 import { ButtonParameters } from "../ButtonParameters"
-import Discord from "discord.js"
+import Discord, { TextChannel } from "discord.js"
 import config from "../config"
 import * as db from "../db"
 import * as mongo from "../mongo"
@@ -10,7 +10,7 @@ import * as queueMessage from "../handlers/queueMessage"
 
 export default {
 	run: async ({ button, client }: ButtonParameters) => {
-		// args are: ilost
+		// args are: host
 
 		// None of these errors should fire since buttons can only be in the Guild
 		if (!button.member) throw new Error("Button Member undefined")
@@ -23,9 +23,9 @@ export default {
 			throw new Error("Button message is not a Message")
 		}
 
-		let opponent = games.findOpponent(button.member.id)
+		let buttonMemberID = button.member.id
 
-		if (!opponent) {
+		if (!games.inGame(button.member.id)) {
 			return button.message.edit({
 				embeds: [
 					new Discord.MessageEmbed()
@@ -35,75 +35,71 @@ export default {
 			})
 		}
 
+		let opponent = games.findOpponent(button.member.id)
+
 		const msg = await button.channel.send({
-			content: `<@!${opponent}> <@!${button.id}>`,
+			content: `<@!${button.member.id}> <@!${opponent}>`,
 			embeds: [
 				new Discord.MessageEmbed()
 					.setColor("BLUE")
-					.setDescription(
-						`React with a :thumbsup: if you consent that <@!${opponent}> beat <@!${button.id}>`
-					)
+					.setDescription(`React with a :thumbsup: if you consent to aborting the game`)
 			]
 		})
+
+		addAudit(`${button.member.id} tried to abort a game with ${opponent}`)
 
 		await msg.react("👍")
 		await msg.react("👎")
 
-		addAudit(`${button.id} ilost to ${opponent}`)
-
-		const filter = (reaction, user) => user.id === opponent
+		const filter = (reaction, user) => user.id == opponent
 		const collector = msg.createReactionCollector({ time: 60 * 1000, filter })
 
 		collector.on("collect", async (reaction, user) => {
 			if (reaction.emoji.name == "👍") {
-				collector.stop("success")
+				return collector.stop("success")
 			} else if (reaction.emoji.name == "👎") {
-				collector.stop("failure")
+				return collector.stop("failure")
 			}
 		})
 
-		collector.on("end", async (collection, reason) => {
+		collector.on("end", (collection, reason) => {
 			msg.reactions.removeAll()
-			if (!button.member) throw new Error("Button Member undefined")
-			if (!(button.message instanceof Discord.Message)) {
-				throw new Error("Button message is not a Message")
-			}
-			if (!(button.member instanceof Discord.GuildMember)) {
-				throw new Error("Button member is not a GuildMember")
-			}
-
 			if (reason == "success") {
-				if (opponent != games.findOpponent(button.message.id)) {
-					return button.message.edit({
+				if (games.findOpponent(buttonMemberID) != opponent) {
+					return msg.edit({
 						embeds: [
 							new Discord.MessageEmbed()
-								.setColor("RED")
-								.setDescription(
-									"Internal Error: Game End Failed! If this is an issue contact Mysterium"
-								)
+								.setColor("NOT_QUITE_BLACK")
+								.setDescription("An internal error has occured. Game not found.")
 						]
 					})
 				}
 
-				if (!opponent) return
-				let result = await games.executeGame(opponent)
+				addAudit(`${buttonMemberID} aborted a game with ${opponent}`)
 
-				addAudit(`${button.member.id} ${opponent} Game Over!`)
+				games.deleteGame(buttonMemberID)
 				queueMessage.updateMessage(client)
+
 				return button.channel?.delete()
 			}
 			if (reason == "failure") {
-				addAudit(`${button.member.id} ${opponent} Game end failed`)
+				addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
 				return msg.edit({
 					embeds: [
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription("Your opponent denied the win")
+							.setDescription("Game abortion rejected. You may have to =resign")
 					]
 				})
 			}
-
-			addAudit(`${button.member.id} ${opponent} Game end failed`)
+			addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
+			return msg.edit({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("NOT_QUITE_BLACK")
+						.setDescription("Game abortion request timed out")
+				]
+			})
 		})
 	}
 }

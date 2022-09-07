@@ -164,7 +164,8 @@ export default {
 					new MessageButton()
 						.setCustomId("host")
 						.setLabel("Find Host")
-						.setStyle("PRIMARY")
+						.setStyle("PRIMARY"),
+					new MessageButton().setCustomId("abort").setLabel("Abort").setStyle("DANGER")
 				])
 			]
 		})
