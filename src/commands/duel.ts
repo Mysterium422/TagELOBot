@@ -216,9 +216,6 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 					})
 				}
 
-				games.newGame(message.author.id, pingedMemberID)
-
-				addAudit(`${message.author.id} ${pingedMemberID} Game Start`)
 				let matchesRows = await db.where(db.TABLES.Matches, {
 					channel: message.channel.id
 				})
@@ -233,6 +230,10 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 						{ channel: message.channel.id, matches: match }
 					)
 				}
+
+				games.newGame(message.author.id, pingedMemberID, match)
+
+				addAudit(`${message.author.id} ${pingedMemberID} Game Start`)
 
 				let player1 = await mongo.findOne(mongo.MODELS.Users, {
 					userID: message.author.id

@@ -93,10 +93,6 @@ export default {
 			})
 		}
 
-		games.newGame(player.userID, opponent.userID)
-
-		await queueMessage.updateMessage(client)
-
 		let matchesRows = await db.where(db.TABLES.Matches, { channel: button.channel.id })
 		let match = 1
 		if (matchesRows.length == 0) {
@@ -109,6 +105,10 @@ export default {
 				{ channel: button.channel.id, matches: match }
 			)
 		}
+
+		games.newGame(player.userID, opponent.userID, match)
+
+		await queueMessage.updateMessage(client)
 
 		addAudit(`Starting match ${match} ${opponent.userID} vs ${button.member.id}`)
 

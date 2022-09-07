@@ -1,6 +1,7 @@
 import config from "../config"
 import * as mongo from "../mongo"
 import * as queue from "./queue"
+import Discord, { EmbedFieldData } from "discord.js"
 
 class Game {
 	public type: "game" | "duel"
@@ -11,8 +12,9 @@ class Game {
 		userID: string
 	}
 	public host: boolean
+	public match: number
 
-	constructor(userID1: string, userID2: string, type: "game" | "duel") {
+	constructor(userID1: string, userID2: string, type: "game" | "duel", match: number) {
 		this.type = type
 		this.player1 = {
 			userID: userID1
@@ -21,6 +23,7 @@ class Game {
 			userID: userID2
 		}
 		this.host = false
+		this.match = match
 	}
 
 	public hostRequested() {
@@ -28,7 +31,14 @@ class Game {
 	}
 }
 
+type EndedGame = {
+	type: "game" | "duel"
+	match: number
+	game: executeGameReturn
+}
+
 let games: Game[] = []
+export let recentGames: EndedGame[] = []
 
 function inGame(playerID: string): boolean {
 	return games.some((entry) => {
@@ -36,7 +46,7 @@ function inGame(playerID: string): boolean {
 	})
 }
 
-function newGame(userID1: string, userID2: string) {
+function newGame(userID1: string, userID2: string, match: number) {
 	if (
 		games.some((entry) => {
 			return inGame(userID1) || inGame(userID2)
@@ -45,7 +55,7 @@ function newGame(userID1: string, userID2: string) {
 		throw new Error("Player is already in a game")
 	}
 
-	let game = new Game(userID1, userID2, "game")
+	let game = new Game(userID1, userID2, "game", match)
 	games.push(game)
 
 	if (queue.inQueue(userID1)) {
@@ -149,6 +159,26 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 
 	deleteGame(winnerID)
 
+	const endedGame: EndedGame = {
+		type: game.type,
+		match: game.match,
+		game: {
+			winner: {
+				userID: winnerID,
+				oldElo: Math.round(winnerRating),
+				newElo: Math.round(winnerNewRating)
+			},
+			loser: {
+				userID: loserID,
+				oldElo: Math.round(loserRating),
+				newElo: Math.round(loserNewRating)
+			}
+		}
+	}
+
+	if (recentGames.length > 4) recentGames.shift()
+	recentGames.push(endedGame)
+
 	return {
 		winner: {
 			userID: winnerID,
@@ -167,6 +197,38 @@ export function debugGames() {
 	for (let i = 0; i < games.length; i++) {
 		console.log(games[i])
 	}
+}
+
+export async function generateCurrentGamesString(): Promise<string> {
+	if (games.length == 0) return "None found"
+	let players = await mongo.find(mongo.MODELS.Users, {})
+	let string = ""
+	for (let i = 0; i < games.length; i++) {
+		let player1 = players.filter((a) => {
+			return a.userID == games[i].player1.userID
+		})[0]
+		let player2 = players.filter((a) => {
+			return a.userID == games[i].player2.userID
+		})[0]
+		string = `${string}\n<@!${player1.userID}> (${player1.elo}) :crossed_swords: <@!${player2.userID}> (${player2.elo})`
+	}
+	return string
+}
+
+export function generateRecentGames(): Discord.EmbedFieldData[] {
+	let data: EmbedFieldData[] = []
+	for (let i = 0; i < recentGames.length; i++) {
+		let recentGame = recentGames[i]
+		let winner = recentGame.game.winner
+		let loser = recentGame.game.loser
+		data.push({
+			name: `Match ${recentGame.match}`,
+			value: `Winner: <@!${winner.userID}> ${winner.oldElo} --> ${winner.newElo}
+Loser: <@!${loser.userID}> ${loser.oldElo} --> ${loser.newElo}`,
+			inline: false
+		})
+	}
+	return data
 }
 
 export { inGame, newGame, findGame, findOpponent, deleteGame, executeGame }
