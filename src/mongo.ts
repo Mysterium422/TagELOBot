@@ -76,7 +76,7 @@ export const findOne = <K extends keyof MongoMap>(
 	model: K,
 	query: Partial<MongoMap[K]>
 ): Promise<MongoMap[K] | null> => {
-	return models[model].findOne(query).toJSON()
+	return models[model].findOne(query)
 }
 
 export const findOneAndReplace = <K extends keyof MongoMap>(

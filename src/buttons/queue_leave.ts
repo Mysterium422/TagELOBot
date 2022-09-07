@@ -5,6 +5,7 @@ import { addAudit, simulateDM } from "../utils"
 import config from "../config"
 import * as queue from "../handlers/queue"
 import * as games from "../handlers/game"
+import * as queueMessage from "../handlers/queueMessage"
 
 export default {
 	run: async ({ button, client }: ButtonParameters) => {
@@ -47,36 +48,15 @@ export default {
 
 		queue.leave(button.member.id)
 
-		// TODO: Update message
-
-		// message.channel.send({
-		// 	embeds: [
-		// 		new Discord.MessageEmbed()
-		// 			.setColor("BLUE")
-		// 			.setDescription(
-		// 				`There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
-		// 					queue.queueSize() != 1 ? "players" : "player"
-		// 				} in the queue`
-		// 			)
-		// 	]
-		// })
-		button.member
-			.send({
-				embeds: [
-					new Discord.MessageEmbed()
-						.setColor("RED")
-						.setDescription("Removed you from the queue")
-				]
-			})
-			.catch((err) =>
-				simulateDM(
-					button.member as GuildMember,
-					new Discord.MessageEmbed()
-						.setColor("RED")
-						.setDescription("Removed you from the queue"),
-					client
-				)
-			)
+		await queueMessage.updateMessage(client)
+		button.reply({
+			embeds: [
+				new Discord.MessageEmbed()
+					.setColor("RED")
+					.setDescription("Removed you from the queue")
+			],
+			ephemeral: true
+		})
 
 		addAudit(`${button.member.id} left a game`)
 		return

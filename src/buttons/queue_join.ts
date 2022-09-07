@@ -7,6 +7,7 @@ import * as games from "../handlers/game"
 import * as db from "../db"
 import * as mongo from "../mongo"
 import Discord from "discord.js"
+import * as queueMessage from "../handlers/queueMessage"
 
 export default {
 	run: async ({ button, client }: ButtonParameters) => {
@@ -80,54 +81,21 @@ export default {
 		let opponent = queue.findOpponent(player.userID, player)
 		if (!opponent) {
 			queue.join(player.userID, player)
-			// TODO: Update Message
 
-			// message.channel.send({
-			// 	embeds: [
-			// 		new Discord.MessageEmbed()
-			// 			.setColor("BLUE")
-			// 			.setDescription(
-			// 				`There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
-			// 					queue.queueSize() != 1 ? "players" : "player"
-			// 				} in the queue`
-			// 			)
-			// 	]
-			// })
-
-			return button.member
-				.send({
-					embeds: [
-						new Discord.MessageEmbed()
-							.setColor("GREEN")
-							.setDescription("Added you to the queue!")
-					]
-				})
-				.catch((err) => {
-					simulateDM(
-						button.member as GuildMember,
-						new Discord.MessageEmbed()
-							.setColor("GREEN")
-							.setDescription("Added you to the queue!"),
-						client
-					)
-				})
+			await queueMessage.updateMessage(client)
+			return button.reply({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("GREEN")
+						.setDescription("Added you to the queue!")
+				],
+				ephemeral: true
+			})
 		}
 
 		games.newGame(player.userID, opponent.userID)
 
-		// TODO: Update Message
-
-		// button.channel.send({
-		// 	embeds: [
-		// 		new Discord.MessageEmbed()
-		// 			.setColor("BLUE")
-		// 			.setDescription(
-		// 				`There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
-		// 					queue.queueSize() != 1 ? "players" : "player"
-		// 				} in the queue`
-		// 			)
-		// 	]
-		// })
+		await queueMessage.updateMessage(client)
 
 		let matchesRows = await db.where(db.TABLES.Matches, { channel: button.channel.id })
 		let match = 1
@@ -149,18 +117,17 @@ export default {
 		})
 		if (!opponentData) throw new Error("Mongo player not found")
 
-		// TODO: Game started msg
-
-		// 		return message.channel.send({
-		// 			content: `<@!${message.author.id}> <@!${opponent.userID}>`,
-		// 			embeds: [
-		// 				new Discord.MessageEmbed().setColor("BLUE")
-		// 					.setDescription(`Game ${match} Starting:
-		// <@!${opponent.userID}> ${opponentData.username} (${Math.round(opponentData.elo)}) vs <@!${
-		// 					message.author.id
-		// 				}> ${player.username} (${Math.round(player.elo)})`)
-		// 			]
-		// 		})
+		return button.reply({
+			content: `<@!${button.member.id}> <@!${opponent.userID}>`,
+			embeds: [
+				new Discord.MessageEmbed().setColor("BLUE")
+					.setDescription(`Game ${match} Starting:
+<@!${opponent.userID}> ${opponentData.username} (${Math.round(opponentData.elo)}) vs <@!${
+					button.member.id
+				}> ${player.username} (${Math.round(player.elo)})`)
+			],
+			ephemeral: true
+		})
 	},
 	data: new MessageButton().setCustomId("queue_join").setLabel("Join").setStyle("SUCCESS")
 }
