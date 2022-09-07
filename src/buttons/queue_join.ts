@@ -169,6 +169,16 @@ export default {
 				new MessageActionRow().addComponents([
 					new MessageButton().setCustomId("abort").setLabel("Abort").setStyle("DANGER"),
 					new MessageButton().setCustomId("scan").setLabel("Scan").setStyle("DANGER")
+				]),
+				new MessageActionRow().addComponents([
+					new MessageButton()
+						.setCustomId("opponentafk")
+						.setLabel("AFK Opponent")
+						.setStyle("SECONDARY"),
+					new MessageButton()
+						.setCustomId("staff")
+						.setLabel("Staff Summon")
+						.setStyle("SECONDARY")
 				])
 			]
 		})
