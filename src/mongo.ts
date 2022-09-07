@@ -72,11 +72,11 @@ const models = {
 	users: usersModel
 }
 
-export const findOne = <K extends keyof MongoMap>(
+export const findOne = async <K extends keyof MongoMap>(
 	model: K,
 	query: Partial<MongoMap[K]>
 ): Promise<MongoMap[K] | null> => {
-	return models[model].findOne(query)
+	return JSON.parse(JSON.stringify(await models[model].findOne(query)))
 }
 
 export const findOneAndReplace = <K extends keyof MongoMap>(

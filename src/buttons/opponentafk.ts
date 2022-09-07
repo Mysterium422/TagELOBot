@@ -27,14 +27,22 @@ export default {
 			throw new Error("Button channel is not a Text CHannel")
 		}
 
+		await button.deferUpdate()
+
 		let buttonMemberID = button.member.id
-		const buttonToEnable = button.message.components[2].components[0]
 
 		addAudit(
 			`${button.member.id} accused ${games.findOpponent(button.member.id)} of being afk`
 		)
 
+		button.message.components[0].components[0].setDisabled(true)
+		button.message.components[1].components[0].setDisabled(true)
 		button.message.components[2].components[0].setDisabled(true)
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
 
 		let msg = await button.channel.send({
 			content: `<@!${games.findOpponent(button.member.id)}>`,
@@ -57,7 +65,17 @@ export default {
 		collector.on("end", async (collection, reason) => {
 			msg.reactions.removeAll()
 			if (reason == "NOTAFK") {
-				buttonToEnable.setDisabled(false)
+				if (!(button.message instanceof Discord.Message)) {
+					throw new Error("Button message is not a Message")
+				}
+				button.message.components[0].components[0].setDisabled(true)
+				button.message.components[1].components[0].setDisabled(true)
+				button.message.components[2].components[0].setDisabled(true)
+				await button.message.edit({
+					content: button.message.content,
+					embeds: button.message.embeds,
+					components: button.message.components
+				})
 				return msg.delete()
 			}
 
@@ -82,8 +100,18 @@ export default {
 
 			collector2.on("end", async (collection, reason) => {
 				msg2.reactions.removeAll()
+				if (!(button.message instanceof Discord.Message)) {
+					throw new Error("Button message is not a Message")
+				}
 				if (reason == "NOTAFK") {
-					buttonToEnable.setDisabled(false)
+					button.message.components[0].components[0].setDisabled(true)
+					button.message.components[1].components[0].setDisabled(true)
+					button.message.components[2].components[0].setDisabled(true)
+					await button.message.edit({
+						content: button.message.content,
+						embeds: button.message.embeds,
+						components: button.message.components
+					})
 					return msg2.delete()
 				}
 
@@ -110,7 +138,17 @@ export default {
 				collector3.on("end", async (collection, reason) => {
 					msg3.reactions.removeAll()
 					if (reason == "NOTAFK") {
-						buttonToEnable.setDisabled(false)
+						if (!(button.message instanceof Discord.Message)) {
+							throw new Error("Button message is not a Message")
+						}
+						button.message.components[0].components[0].setDisabled(true)
+						button.message.components[1].components[0].setDisabled(true)
+						button.message.components[2].components[0].setDisabled(true)
+						await button.message.edit({
+							content: button.message.content,
+							embeds: button.message.embeds,
+							components: button.message.components
+						})
 						return msg3.delete()
 					}
 

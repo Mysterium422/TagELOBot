@@ -26,7 +26,16 @@ export default {
 			throw new Error("Button channel is not a Text CHannel")
 		}
 
+		await button.deferUpdate()
+
 		button.message.components[2].components[1].setDisabled(true)
+
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
+
 		button.channel.send(`<@&${config.staffRoleID}> has been requested`)
 	}
 }

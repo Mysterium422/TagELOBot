@@ -26,11 +26,19 @@ export default {
 			throw new Error("Button channel is not a Text CHannel")
 		}
 
+		await button.deferUpdate()
+
 		button.message.components[0].components[0].setDisabled(true)
 		button.message.components[0].components[1].setDisabled(true)
 		button.message.components[1].components[0].setDisabled(true)
 		button.message.components[1].components[1].setDisabled(true)
 		button.message.components[2].components[0].setDisabled(true)
+
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
 
 		let accused = games.findOpponent(button.member.id)
 		if (!accused) {
@@ -95,7 +103,7 @@ export default {
 		})
 
 		let thread = await msg.startThread({
-			name: "Game Chat",
+			name: "Scan Chat",
 			autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek
 		})
 

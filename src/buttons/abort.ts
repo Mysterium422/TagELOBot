@@ -1,5 +1,5 @@
 import { ButtonParameters } from "../ButtonParameters"
-import Discord, { TextChannel } from "discord.js"
+import Discord, { Emoji, TextChannel } from "discord.js"
 import config from "../config"
 import * as db from "../db"
 import * as mongo from "../mongo"
@@ -23,6 +23,8 @@ export default {
 			throw new Error("Button message is not a Message")
 		}
 
+		await button.deferUpdate()
+
 		let buttonMemberID = button.member.id
 
 		if (!games.inGame(button.member.id)) {
@@ -37,7 +39,14 @@ export default {
 
 		let opponent = games.findOpponent(button.member.id)
 
+		button.message.components[0].components[0].setDisabled(true)
 		button.message.components[1].components[0].setDisabled(true)
+		button.message.components[2].components[0].setDisabled(true)
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
 
 		const msg = await button.channel.send({
 			content: `<@!${button.member.id}> <@!${opponent}>`,
@@ -91,7 +100,14 @@ export default {
 			}
 			if (reason == "failure") {
 				addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
+				button.message.components[0].components[0].setDisabled(false)
 				button.message.components[1].components[0].setDisabled(false)
+				button.message.components[2].components[0].setDisabled(false)
+				button.message.edit({
+					content: button.message.content,
+					embeds: button.message.embeds,
+					components: button.message.components
+				})
 				return msg.edit({
 					embeds: [
 						new Discord.MessageEmbed()
@@ -101,7 +117,15 @@ export default {
 				})
 			}
 			addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
+
+			button.message.components[0].components[0].setDisabled(false)
 			button.message.components[1].components[0].setDisabled(false)
+			button.message.components[2].components[0].setDisabled(false)
+			button.message.edit({
+				content: button.message.content,
+				embeds: button.message.embeds,
+				components: button.message.components
+			})
 			return msg.edit({
 				embeds: [
 					new Discord.MessageEmbed()

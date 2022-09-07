@@ -22,6 +22,8 @@ export default {
 			throw new Error("Button message is not a Message")
 		}
 
+		await button.deferUpdate()
+
 		let game = games.findGame(button.member.id)
 		if (!game) {
 			return button.message.edit({
@@ -32,7 +34,13 @@ export default {
 				]
 			})
 		}
+
 		button.message.components[0].components[1].setDisabled(true)
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
 
 		game.hostRequested()
 		let channel = await button.guild.channels.fetch(config.commandsChannelID)
@@ -45,9 +53,14 @@ export default {
 		await msg.react("✋")
 
 		let buttonMemberID = button.member.id
+		let opponentID = games.findOpponent(buttonMemberID)
 
 		const filter = async (reaction, user) => {
-			return reaction.emoji.name == "✋" && user.id != buttonMemberID
+			return (
+				reaction.emoji.name == "✋" &&
+				user.id != buttonMemberID &&
+				user.id != buttonMemberID
+			)
 		}
 		const collector = msg.createReactionCollector({ time: 600 * 1000, filter })
 		collector.on("collect", async (reaction, user) => {

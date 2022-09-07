@@ -23,9 +23,19 @@ export default {
 			throw new Error("Button message is not a Message")
 		}
 
+		await button.deferUpdate()
+
 		let opponent = games.findOpponent(button.member.id)
 
 		button.message.components[0].components[0].setDisabled(true)
+		button.message.components[1].components[0].setDisabled(true)
+		button.message.components[2].components[0].setDisabled(true)
+
+		await button.message.edit({
+			content: button.message.content,
+			embeds: button.message.embeds,
+			components: button.message.components
+		})
 
 		if (!opponent) {
 			return button.message.edit({
@@ -38,12 +48,12 @@ export default {
 		}
 
 		const msg = await button.channel.send({
-			content: `<@!${opponent}> <@!${button.id}>`,
+			content: `<@!${opponent}> <@!${button.member.id}>`,
 			embeds: [
 				new Discord.MessageEmbed()
 					.setColor("BLUE")
 					.setDescription(
-						`React with a :thumbsup: if you consent that <@!${opponent}> beat <@!${button.id}>`
+						`React with a :thumbsup: if you consent that <@!${opponent}> beat <@!${button.member.id}>`
 					)
 			]
 		})
@@ -51,7 +61,7 @@ export default {
 		await msg.react("👍")
 		await msg.react("👎")
 
-		addAudit(`${button.id} ilost to ${opponent}`)
+		addAudit(`${button.member.id} ilost to ${opponent}`)
 
 		const filter = (reaction, user) => user.id === opponent
 		const collector = msg.createReactionCollector({ time: 60 * 1000, filter })
@@ -75,7 +85,7 @@ export default {
 			}
 
 			if (reason == "success") {
-				if (opponent != games.findOpponent(button.message.id)) {
+				if (opponent != games.findOpponent(button.member.id)) {
 					return button.message.edit({
 						embeds: [
 							new Discord.MessageEmbed()
@@ -92,11 +102,19 @@ export default {
 
 				addAudit(`${button.member.id} ${opponent} Game Over!`)
 				queueMessage.updateMessage(client)
+				console.log("here?")
 				return button.channel?.delete()
 			}
 			if (reason == "failure") {
 				addAudit(`${button.member.id} ${opponent} Game end failed`)
 				button.message.components[0].components[0].setDisabled(false)
+				button.message.components[1].components[0].setDisabled(false)
+				button.message.components[2].components[0].setDisabled(false)
+				button.message.edit({
+					content: button.message.content,
+					embeds: button.message.embeds,
+					components: button.message.components
+				})
 				return msg.edit({
 					embeds: [
 						new Discord.MessageEmbed()
@@ -108,6 +126,13 @@ export default {
 
 			addAudit(`${button.member.id} ${opponent} Game end failed`)
 			button.message.components[0].components[0].setDisabled(false)
+			button.message.components[1].components[0].setDisabled(false)
+			button.message.components[2].components[0].setDisabled(false)
+			button.message.edit({
+				content: button.message.content,
+				embeds: button.message.embeds,
+				components: button.message.components
+			})
 		})
 	}
 }
