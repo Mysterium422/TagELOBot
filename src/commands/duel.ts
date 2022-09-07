@@ -1,11 +1,13 @@
 import { CommandParameters } from "../CommandParameters"
-import Discord from "discord.js"
+import Discord, { MessageActionRow, MessageButton } from "discord.js"
 import { simulateDM, locked, addAudit } from "../utils"
 import config from "../config"
 import * as queue from "../handlers/queue"
 import * as games from "../handlers/game"
 import * as db from "../db"
 import * as mongo from "../mongo"
+import * as queueMessage from "../handlers/queueMessage"
+import { ThreadAutoArchiveDuration } from "discord-api-types/v9"
 
 export default {
 	run: async ({ message, client }: CommandParameters) => {
@@ -17,7 +19,7 @@ export default {
 			return
 		}
 
-		if (message.channel.id != config.queueChannelID) {
+		if (message.channel.id != config.commandsChannelID) {
 			setTimeout(async function () {
 				message.delete()
 			}, 200)
@@ -217,21 +219,23 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 				}
 
 				let matchesRows = await db.where(db.TABLES.Matches, {
-					channel: message.channel.id
+					channel: config.queueChannelID
 				})
 				let match = 1
 				if (matchesRows.length == 0) {
-					await db.add(db.TABLES.Matches, { channel: message.channel.id, matches: 0 })
+					await db.add(db.TABLES.Matches, { channel: config.queueChannelID, matches: 0 })
 				} else {
 					match = matchesRows[0].matches + 1
 					await db.update(
 						db.TABLES.Matches,
-						{ channel: message.channel.id },
-						{ channel: message.channel.id, matches: match }
+						{ channel: config.queueChannelID },
+						{ channel: config.queueChannelID, matches: match }
 					)
 				}
 
 				games.newGame(message.author.id, pingedMemberID, match)
+
+				await queueMessage.updateMessage(client)
 
 				addAudit(`${message.author.id} ${pingedMemberID} Game Start`)
 
@@ -241,6 +245,98 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 				let player2 = await mongo.findOne(mongo.MODELS.Users, { userID: pingedMemberID })
 				if (!player1) throw new Error("Couldnt find mongo duel player 1")
 				if (!player2) throw new Error("Couldnt find mongo duel player 2")
+
+				let matchString: string = `${match < 1000 ? 0 : ""}${match < 100 ? 0 : ""}${
+					match < 10 ? 0 : ""
+				}${match}`
+
+				if (!message.guild) throw new Error("Message Guild gone")
+
+				let channel = await message.guild.channels.create(`Game-${matchString}`, {
+					type: "GUILD_TEXT",
+					parent: config.rankedCategoryID,
+					permissionOverwrites: [
+						{
+							id: config.guildID,
+							deny: ["VIEW_CHANNEL"]
+						},
+						{
+							id: config.staffRoleID,
+							allow: ["VIEW_CHANNEL"]
+						},
+						{
+							id: message.author.id,
+							allow: ["VIEW_CHANNEL", "SEND_MESSAGES_IN_THREADS"],
+							deny: ["SEND_MESSAGES", "CREATE_PUBLIC_THREADS", "USE_APPLICATION_COMMANDS"]
+						},
+						{
+							id: pingedMemberID,
+							allow: ["VIEW_CHANNEL", "SEND_MESSAGES_IN_THREADS"],
+							deny: ["SEND_MESSAGES", "CREATE_PUBLIC_THREADS", "USE_APPLICATION_COMMANDS"]
+						}
+					]
+				})
+
+				await channel.send({
+					content: `<@!${message.author.id}> <@!${pingedMemberID}>`,
+					embeds: [
+						new Discord.MessageEmbed()
+							.setColor("BLUE")
+							.setTitle(`Game ${match}`)
+							.setDescription(
+								`<@!${pingedMemberID}> ${player2.username} (${Math.round(
+									player2.elo
+								)})\n<@!${message.author.id}> ${player1.username} (${Math.round(
+									player1.elo
+								)})`
+							)
+					],
+					components: [
+						new MessageActionRow().addComponents([
+							new MessageButton()
+								.setCustomId("ilost")
+								.setLabel("iLost")
+								.setStyle("PRIMARY"),
+							new MessageButton()
+								.setCustomId("host")
+								.setLabel("Find Host")
+								.setStyle("PRIMARY")
+						]),
+						new MessageActionRow().addComponents([
+							new MessageButton()
+								.setCustomId("abort")
+								.setLabel("Abort")
+								.setStyle("DANGER"),
+							new MessageButton().setCustomId("scan").setLabel("Scan").setStyle("DANGER")
+						]),
+						new MessageActionRow().addComponents([
+							new MessageButton()
+								.setCustomId("opponentafk")
+								.setLabel("AFK Opponent")
+								.setStyle("SECONDARY"),
+							new MessageButton()
+								.setCustomId("staff")
+								.setLabel("Staff Summon")
+								.setStyle("SECONDARY")
+						])
+					]
+				})
+
+				let mesg = await channel.send({
+					embeds: [
+						new Discord.MessageEmbed()
+							.setColor("BLUE")
+							.setTitle("Game Chat")
+							.setDescription("Use this thread to discuss anything about your game")
+					]
+				})
+
+				let thread = await mesg.startThread({
+					name: "Game Chat",
+					autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek
+				})
+				let msg2 = await thread.send({ content: "This thread is now available for use" })
+				await msg2.delete()
 
 				return msg.edit({
 					embeds: [

@@ -14,7 +14,7 @@ export async function generateMessage(): Promise<Discord.MessageEditOptions> {
 				.setDescription(
 					`There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
 						queue.queueSize() != 1 ? "players" : "player"
-					} in the queue
+					} in the queue.
 
 __**Current Games**__
 ${await games.generateCurrentGamesString()}

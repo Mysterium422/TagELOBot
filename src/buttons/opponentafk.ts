@@ -68,9 +68,9 @@ export default {
 				if (!(button.message instanceof Discord.Message)) {
 					throw new Error("Button message is not a Message")
 				}
-				button.message.components[0].components[0].setDisabled(true)
-				button.message.components[1].components[0].setDisabled(true)
-				button.message.components[2].components[0].setDisabled(true)
+				button.message.components[0].components[0].setDisabled(false)
+				button.message.components[1].components[0].setDisabled(false)
+				button.message.components[2].components[0].setDisabled(false)
 				await button.message.edit({
 					content: button.message.content,
 					embeds: button.message.embeds,
@@ -104,9 +104,9 @@ export default {
 					throw new Error("Button message is not a Message")
 				}
 				if (reason == "NOTAFK") {
-					button.message.components[0].components[0].setDisabled(true)
-					button.message.components[1].components[0].setDisabled(true)
-					button.message.components[2].components[0].setDisabled(true)
+					button.message.components[0].components[0].setDisabled(false)
+					button.message.components[1].components[0].setDisabled(false)
+					button.message.components[2].components[0].setDisabled(false)
 					await button.message.edit({
 						content: button.message.content,
 						embeds: button.message.embeds,
@@ -141,9 +141,9 @@ export default {
 						if (!(button.message instanceof Discord.Message)) {
 							throw new Error("Button message is not a Message")
 						}
-						button.message.components[0].components[0].setDisabled(true)
-						button.message.components[1].components[0].setDisabled(true)
-						button.message.components[2].components[0].setDisabled(true)
+						button.message.components[0].components[0].setDisabled(false)
+						button.message.components[1].components[0].setDisabled(false)
+						button.message.components[2].components[0].setDisabled(false)
 						await button.message.edit({
 							content: button.message.content,
 							embeds: button.message.embeds,

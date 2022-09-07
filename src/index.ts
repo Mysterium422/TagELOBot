@@ -6,6 +6,7 @@ import config from "./config"
 import { addAudit, consolelog } from "./utils"
 import * as db from "./db"
 import * as mongo from "./mongo"
+import * as queueMessage from "./handlers/queueMessage"
 
 const client = new Client({
 	intents: [
@@ -60,6 +61,8 @@ client.on("ready", async () => {
 	}
 
 	consolelog("[START] Commands loaded")
+
+	queueMessage.updateMessage(client)
 
 	try {
 		consolelog("[START] Loading buttons...")

@@ -1,8 +1,9 @@
 import { CommandParameters } from "../CommandParameters"
-import Discord from "discord.js"
+import Discord, { TextChannel } from "discord.js"
 import { addAudit, hasStaffPermission, Staff } from "../utils"
 import config from "../config"
 import * as games from "../handlers/game"
+import * as queueMessage from "../handlers/queueMessage"
 
 export default {
 	run: async ({ message }: CommandParameters) => {
@@ -16,6 +17,8 @@ export default {
 
 		if (!message.member) throw new Error("Message member missing")
 		if (!hasStaffPermission(message.member, Staff.STAFF)) return
+		if (!(message.channel instanceof TextChannel)) throw new Error("")
+		if (!message.channel.name.startsWith("game-")) return
 
 		if (!message.mentions.members || message.mentions.members.size == 0) {
 			return message.channel.send({
@@ -53,6 +56,7 @@ export default {
 		let result = await games.executeGame(pingedID)
 
 		addAudit(`${message.author.id} resolved ${pingedID}'s game Game Over!`)
+		return message.channel.delete()
 		return message.channel.send({
 			embeds: [
 				new Discord.MessageEmbed().setColor("BLUE").setDescription(`**Game Results**

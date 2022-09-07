@@ -210,7 +210,9 @@ export async function generateCurrentGamesString(): Promise<string> {
 		let player2 = players.filter((a) => {
 			return a.userID == games[i].player2.userID
 		})[0]
-		string = `${string}\n<@!${player1.userID}> (${player1.elo}) :crossed_swords: <@!${player2.userID}> (${player2.elo})`
+		string = `${string}\n<@!${player1.userID}> (${Math.round(
+			player1.elo
+		)}) :crossed_swords: <@!${player2.userID}> (${Math.round(player2.elo)})`
 	}
 	return string
 }

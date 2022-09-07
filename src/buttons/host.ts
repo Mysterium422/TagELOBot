@@ -78,8 +78,16 @@ export default {
 			if (!(button.member instanceof Discord.GuildMember)) {
 				throw new Error("Button member is not a GuildMember")
 			}
+			if (!button.channel) throw new Error("Button Channel null")
+			if (!(button.channel instanceof TextChannel)) {
+				throw new Error("Commands Channel not Text Channel")
+			}
 
-			channel.send(`<@!${button.member.id}> <@!${user.id}> can host!`)
+			channel.send(
+				`<@!${button.member.id}>, <@!${games.findOpponent(button.member.id)}> <@!${
+					user.id
+				}> can host!`
+			)
 
 			let hostRows = await db.where(db.TABLES.HostData, { discord: user.id })
 			if (hostRows.length == 0) {
