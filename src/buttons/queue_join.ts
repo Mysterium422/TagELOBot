@@ -160,7 +160,11 @@ export default {
 			],
 			components: [
 				new MessageActionRow().addComponents([
-					new MessageButton().setCustomId("ilost").setLabel("iLost").setStyle("PRIMARY")
+					new MessageButton().setCustomId("ilost").setLabel("iLost").setStyle("PRIMARY"),
+					new MessageButton()
+						.setCustomId("host")
+						.setLabel("Find Host")
+						.setStyle("PRIMARY")
 				])
 			]
 		})
