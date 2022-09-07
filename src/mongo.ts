@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema({
 	wins: { type: Number, require: true, default: 0 },
 	losses: { type: Number, require: true, default: 0 },
 	records: { type: Array, require: true, default: [] },
-	deviation: { type: Number, require: true, default: 100 },
+	deviation: { type: Number, require: true, default: 150 },
 	blacklisted: { type: Boolean, require: true, default: false }
 })
 

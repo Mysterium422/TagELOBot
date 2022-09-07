@@ -71,7 +71,7 @@ export default {
 				wins: 0,
 				losses: 0,
 				records: [],
-				deviation: 100,
+				deviation: 150,
 				blacklisted: false
 			})
 
