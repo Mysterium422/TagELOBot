@@ -22,8 +22,18 @@ export default {
 		if (!(button.message instanceof Discord.Message)) {
 			throw new Error("Button message is not a Message")
 		}
+		if (!(button.channel instanceof Discord.TextChannel)) {
+			throw new Error("Button Channel not text")
+		}
 
 		await button.deferUpdate()
+
+		if (
+			games.findGame(button.member.id)?.match !=
+			games.getMatchFromString(button.channel.name)
+		) {
+			return
+		}
 
 		let opponent = games.findOpponent(button.member.id)
 
@@ -85,26 +95,14 @@ export default {
 			}
 
 			if (reason == "success") {
-				if (opponent != games.findOpponent(button.member.id)) {
-					return button.message.edit({
-						embeds: [
-							new Discord.MessageEmbed()
-								.setColor("RED")
-								.setDescription(
-									"Internal Error: Game End Failed! If this is an issue contact Mysterium"
-								)
-						]
-					})
-				}
-
 				if (!opponent) return
-				let result = await games.executeGame(opponent)
+				await games.executeGame(opponent)
 
 				addAudit(`${button.member.id} ${opponent} Game Over!`)
 				queueMessage.updateMessage(client)
-				console.log("here?")
 				return button.channel?.delete()
 			}
+
 			if (reason == "failure") {
 				addAudit(`${button.member.id} ${opponent} Game end failed`)
 				button.message.components[0].components[0].setDisabled(false)

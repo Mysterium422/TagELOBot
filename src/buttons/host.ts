@@ -21,6 +21,9 @@ export default {
 		if (!(button.message instanceof Discord.Message)) {
 			throw new Error("Button message is not a Message")
 		}
+		if (!(button.channel instanceof Discord.TextChannel)) {
+			throw new Error("Button Channel not text")
+		}
 
 		await button.deferUpdate()
 
@@ -33,6 +36,10 @@ export default {
 						.setDescription("An error occurred, contact Mysterium or Admin")
 				]
 			})
+		}
+
+		if (game.match != games.getMatchFromString(button.channel.name)) {
+			return
 		}
 
 		button.message.components[0].components[1].setDisabled(true)

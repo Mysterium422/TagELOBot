@@ -28,6 +28,13 @@ export default {
 
 		await button.deferUpdate()
 
+		if (
+			games.findGame(button.member.id)?.match !=
+			games.getMatchFromString(button.channel.name)
+		) {
+			return
+		}
+
 		button.message.components[0].components[0].setDisabled(true)
 		button.message.components[0].components[1].setDisabled(true)
 		button.message.components[1].components[0].setDisabled(true)

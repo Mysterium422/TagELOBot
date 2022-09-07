@@ -233,4 +233,10 @@ Loser: <@!${loser.userID}> ${loser.oldElo} --> ${loser.newElo}`,
 	return data
 }
 
+export function getMatchFromString(string: string): number {
+	if (!string.startsWith("game-")) return 0
+	string = string.substring(5)
+	return parseInt(string)
+}
+
 export { inGame, newGame, findGame, findOpponent, deleteGame, executeGame }

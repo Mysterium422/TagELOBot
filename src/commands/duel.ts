@@ -295,7 +295,7 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 						new MessageActionRow().addComponents([
 							new MessageButton()
 								.setCustomId("ilost")
-								.setLabel("iLost")
+								.setLabel("I Lost")
 								.setStyle("PRIMARY"),
 							new MessageButton()
 								.setCustomId("host")

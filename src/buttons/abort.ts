@@ -1,5 +1,5 @@
 import { ButtonParameters } from "../ButtonParameters"
-import Discord, { Emoji, TextChannel } from "discord.js"
+import Discord, { Emoji, GuildMember, TextChannel } from "discord.js"
 import config from "../config"
 import * as db from "../db"
 import * as mongo from "../mongo"
@@ -22,19 +22,18 @@ export default {
 		if (!(button.message instanceof Discord.Message)) {
 			throw new Error("Button message is not a Message")
 		}
+		if (!(button.channel instanceof Discord.TextChannel)) {
+			throw new Error("Button Channel not text")
+		}
 
 		await button.deferUpdate()
 
 		let buttonMemberID = button.member.id
+		let channelName = button.channel.name
 
-		if (!games.inGame(button.member.id)) {
-			return button.message.edit({
-				embeds: [
-					new Discord.MessageEmbed()
-						.setColor("RED")
-						.setDescription("An error occurred, contact Mysterium or Admin")
-				]
-			})
+		if (!games.inGame(button.member.id)) return
+		if (games.findGame(buttonMemberID)?.match != games.getMatchFromString(channelName)) {
+			return
 		}
 
 		let opponent = games.findOpponent(button.member.id)
@@ -81,16 +80,6 @@ export default {
 			}
 
 			if (reason == "success") {
-				if (games.findOpponent(buttonMemberID) != opponent) {
-					return msg.edit({
-						embeds: [
-							new Discord.MessageEmbed()
-								.setColor("NOT_QUITE_BLACK")
-								.setDescription("An internal error has occured. Game not found.")
-						]
-					})
-				}
-
 				addAudit(`${buttonMemberID} aborted a game with ${opponent}`)
 
 				games.deleteGame(buttonMemberID)

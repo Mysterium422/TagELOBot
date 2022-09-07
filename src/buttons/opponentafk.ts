@@ -29,6 +29,13 @@ export default {
 
 		await button.deferUpdate()
 
+		if (
+			games.findGame(button.member.id)?.match !=
+			games.getMatchFromString(button.channel.name)
+		) {
+			return
+		}
+
 		let buttonMemberID = button.member.id
 
 		addAudit(
@@ -154,24 +161,22 @@ export default {
 
 					msg3.delete()
 					if (!button.channel) throw new Error("Button Channel undefined")
+					if (!(button.channel instanceof Discord.TextChannel)) {
+						throw new Error("Button channel is not a Text CHannel")
+					}
 
-					if (!games.findOpponent(buttonMemberID)) {
-						return msg3.edit({
-							embeds: [
-								new Discord.MessageEmbed()
-									.setColor("NOT_QUITE_BLACK")
-									.setDescription(
-										"Game End Failed! If this is an issue contact Mysterium"
-									)
-							]
-						})
+					if (
+						games.findGame(buttonMemberID)?.match !=
+						games.getMatchFromString(button.channel.name)
+					) {
+						return
 					}
 
 					addAudit(
 						`${games.findOpponent(buttonMemberID)} was afk! gave win to ${buttonMemberID}`
 					)
 
-					let result = await games.executeGame(buttonMemberID)
+					await games.executeGame(buttonMemberID)
 					queueMessage.updateMessage(client)
 
 					addAudit(`${buttonMemberID} resolved ${buttonMemberID}'s game Game Over!`)
