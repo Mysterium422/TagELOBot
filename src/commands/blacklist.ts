@@ -41,7 +41,7 @@ export default {
 		await mongo.findOneAndReplace(mongo.MODELS.Users, { userID: first.id }, blacklisted)
 
 		addAudit(`Blacklisted data: ${JSON.stringify(blacklisted)}`)
-		await db.del(db.TABLES.UserData, { discord: first.id })
+		await db.update(db.TABLES.UserData, { discord: first.id }, { blacklisted: true })
 		return message.channel.send(`Blacklisted <@!${first.id}>`)
 	}
 }

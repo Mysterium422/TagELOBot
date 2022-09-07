@@ -7,8 +7,10 @@ import * as mongo from "../mongo"
 
 export default {
 	run: async ({ button }: ButtonParameters) => {
+		// args are: register, acc/rej, discord id, username, uuid
 		let args = button.customId.split("-")
 
+		// None of these errors should fire since buttons can only be in the Guild
 		if (!button.member) throw new Error("Button Member undefined")
 		if (!button.channel) throw new Error("Button Channel undefined")
 		if (!button.guild) throw new Error("Button Guild undefined")
@@ -54,7 +56,12 @@ export default {
 			if (!role) throw new Error("Ranked Role not found")
 			await guildMember.roles.add(role)
 
-			await db.add(db.TABLES.UserData, { discord: args[2], name: args[3], uuid: args[4] })
+			await db.add(db.TABLES.UserData, {
+				discord: args[2],
+				name: args[3],
+				uuid: args[4],
+				blacklisted: false
+			})
 
 			mongo.create(mongo.MODELS.Users, {
 				userID: args[2],

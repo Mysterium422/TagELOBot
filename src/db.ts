@@ -28,6 +28,7 @@ export const createTables = async () => {
 		table.string("discord").primary()
 		table.string("uuid").notNullable()
 		table.string("name").notNullable()
+		table.boolean("blacklisted").notNullable()
 	})
 	await defineTable(TABLES.HostData, (table) => {
 		table.string("discord").primary()
@@ -51,6 +52,7 @@ export type UserRow = {
 	discord: string
 	uuid: string
 	name: string
+	blacklisted: boolean
 }
 
 export type HostRow = {
