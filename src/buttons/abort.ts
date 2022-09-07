@@ -37,6 +37,8 @@ export default {
 
 		let opponent = games.findOpponent(button.member.id)
 
+		button.message.components[1].components[0].setDisabled(true)
+
 		const msg = await button.channel.send({
 			content: `<@!${button.member.id}> <@!${opponent}>`,
 			embeds: [
@@ -64,6 +66,11 @@ export default {
 
 		collector.on("end", (collection, reason) => {
 			msg.reactions.removeAll()
+
+			if (!(button.message instanceof Discord.Message)) {
+				throw new Error("Button message is not a Message")
+			}
+
 			if (reason == "success") {
 				if (games.findOpponent(buttonMemberID) != opponent) {
 					return msg.edit({
@@ -84,6 +91,7 @@ export default {
 			}
 			if (reason == "failure") {
 				addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
+				button.message.components[1].components[0].setDisabled(false)
 				return msg.edit({
 					embeds: [
 						new Discord.MessageEmbed()
@@ -93,6 +101,7 @@ export default {
 				})
 			}
 			addAudit(`${buttonMemberID} failed to aborted a game with ${opponent}`)
+			button.message.components[1].components[0].setDisabled(false)
 			return msg.edit({
 				embeds: [
 					new Discord.MessageEmbed()

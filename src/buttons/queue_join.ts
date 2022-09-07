@@ -164,8 +164,11 @@ export default {
 					new MessageButton()
 						.setCustomId("host")
 						.setLabel("Find Host")
-						.setStyle("PRIMARY"),
-					new MessageButton().setCustomId("abort").setLabel("Abort").setStyle("DANGER")
+						.setStyle("PRIMARY")
+				]),
+				new MessageActionRow().addComponents([
+					new MessageButton().setCustomId("abort").setLabel("Abort").setStyle("DANGER"),
+					new MessageButton().setCustomId("scan").setLabel("Scan").setStyle("DANGER")
 				])
 			]
 		})

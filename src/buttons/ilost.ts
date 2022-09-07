@@ -25,6 +25,8 @@ export default {
 
 		let opponent = games.findOpponent(button.member.id)
 
+		button.message.components[0].components[0].setDisabled(true)
+
 		if (!opponent) {
 			return button.message.edit({
 				embeds: [
@@ -94,6 +96,7 @@ export default {
 			}
 			if (reason == "failure") {
 				addAudit(`${button.member.id} ${opponent} Game end failed`)
+				button.message.components[0].components[0].setDisabled(false)
 				return msg.edit({
 					embeds: [
 						new Discord.MessageEmbed()
@@ -104,6 +107,7 @@ export default {
 			}
 
 			addAudit(`${button.member.id} ${opponent} Game end failed`)
+			button.message.components[0].components[0].setDisabled(false)
 		})
 	}
 }
