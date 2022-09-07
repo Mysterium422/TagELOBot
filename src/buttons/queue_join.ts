@@ -1,5 +1,5 @@
 import { ButtonParameters } from "../ButtonParameters"
-import { GuildMember, MessageButton } from "discord.js"
+import { GuildMember, MessageActionRow, MessageButton } from "discord.js"
 import config from "../config"
 import { addAudit, locked, simulateDM } from "../utils"
 import * as queue from "../handlers/queue"
@@ -157,6 +157,11 @@ export default {
 							opponentData.elo
 						)})\n<@!${button.member.id}> ${player.username} (${Math.round(player.elo)})`
 					)
+			],
+			components: [
+				new MessageActionRow().addComponents([
+					new MessageButton().setCustomId("ilost").setLabel("iLost").setStyle("PRIMARY")
+				])
 			]
 		})
 		let msg = await channel.send({
