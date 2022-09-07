@@ -8,6 +8,7 @@ import * as db from "../db"
 import * as mongo from "../mongo"
 import Discord from "discord.js"
 import * as queueMessage from "../handlers/queueMessage"
+import { ThreadAutoArchiveDuration } from "discord-api-types/v9"
 
 export default {
 	run: async ({ button, client }: ButtonParameters) => {
@@ -117,8 +118,63 @@ export default {
 		})
 		if (!opponentData) throw new Error("Mongo player not found")
 
-		return button.reply({
+		let matchString: string = `${match < 1000 ? 0 : ""}${match < 100 ? 0 : ""}${
+			match < 10 ? 0 : ""
+		}${match}`
+
+		let channel = await button.guild.channels.create(`Game-${matchString}`, {
+			type: "GUILD_TEXT",
+			parent: config.rankedCategoryID,
+			permissionOverwrites: [
+				{
+					id: config.guildID,
+					deny: ["VIEW_CHANNEL"]
+				},
+				{
+					id: config.staffRoleID,
+					allow: ["VIEW_CHANNEL"]
+				},
+				{
+					id: button.member.id,
+					allow: ["VIEW_CHANNEL", "SEND_MESSAGES_IN_THREADS"],
+					deny: ["SEND_MESSAGES", "CREATE_PUBLIC_THREADS", "USE_APPLICATION_COMMANDS"]
+				},
+				{
+					id: opponent.userID,
+					allow: ["VIEW_CHANNEL", "SEND_MESSAGES_IN_THREADS"],
+					deny: ["SEND_MESSAGES", "CREATE_PUBLIC_THREADS", "USE_APPLICATION_COMMANDS"]
+				}
+			]
+		})
+		await channel.send({
 			content: `<@!${button.member.id}> <@!${opponent.userID}>`,
+			embeds: [
+				new Discord.MessageEmbed()
+					.setColor("BLUE")
+					.setTitle(`Game ${match}`)
+					.setDescription(
+						`<@!${opponent.userID}> ${opponentData.username} (${Math.round(
+							opponentData.elo
+						)})\n<@!${button.member.id}> ${player.username} (${Math.round(player.elo)})`
+					)
+			]
+		})
+		let msg = await channel.send({
+			embeds: [
+				new Discord.MessageEmbed()
+					.setColor("BLUE")
+					.setTitle("Game Chat")
+					.setDescription("Use this thread to discuss anything about your game")
+			]
+		})
+		let thread = await msg.startThread({
+			name: "Game Chat",
+			autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek
+		})
+		let msg2 = await thread.send({ content: "This thread is now available for use" })
+		await msg2.delete()
+
+		return button.reply({
 			embeds: [
 				new Discord.MessageEmbed().setColor("BLUE")
 					.setDescription(`Game ${match} Starting:
