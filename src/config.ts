@@ -1,7 +1,7 @@
 import { readFileSync } from "fs"
 import { resolve } from "path"
 
-const CONFIG_PATH = resolve(__dirname, "../config_test.json")
+const CONFIG_PATH = resolve(__dirname, "../config.json")
 const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly prefix: string
 	readonly token: string

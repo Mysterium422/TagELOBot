@@ -2,6 +2,7 @@ import { CommandParameters } from "../CommandParameters"
 import Discord from "discord.js"
 import {
 	addAudit,
+	getAltBanisherUUID,
 	hypixelFetch,
 	HypixelResponse,
 	mojangUUIDFetch,
@@ -100,6 +101,12 @@ export default {
 			})
 		}
 
+		let altUUID = getAltBanisherUUID(message.author.id)
+		let altString: string
+		if (!altUUID) altString = "Data not found"
+		if (altUUID != data.player.uuid) altString = "UUID does not match"
+		else altString = "UUID matches"
+
 		await message.channel.send({
 			components: [
 				new Discord.MessageActionRow().addComponents([
@@ -124,6 +131,7 @@ export default {
 					
 **Username:** ${data.player.displayname}
 **UUID:** ${data.player.uuid}
+**Registered UUID:** ${altString}
 **Tag Wins:** ${replaceError(data.player.stats.TNTGames.wins_tntag, 0)}
 **Network Level:** ${Math.floor(
 							Math.sqrt(2 * replaceError(data.player.networkExp, 0) + 30625) / 50 - 2.5

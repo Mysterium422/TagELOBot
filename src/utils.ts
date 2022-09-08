@@ -5,6 +5,8 @@ import { resolve } from "path"
 import fetch from "node-fetch"
 
 const AUDIT_PATH = resolve(__dirname, "../audit.txt")
+const PLAYER_DATA_PATH = resolve(__dirname, "../player_data")
+const player_data = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH, "utf-8"))
 
 let mojangQueries = 0
 function newMojangQuery() {
@@ -171,4 +173,10 @@ export function consolelog(text: string) {
 
 export function lockQueue() {
 	locked = true
+}
+
+export function getAltBanisherUUID(discordID: string): string | null {
+	let data = player_data[discordID]
+	if (!data) return null
+	return data.uuid
 }

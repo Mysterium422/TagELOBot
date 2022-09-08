@@ -8,5 +8,6 @@ config.json
 config_test.json
 build
 mongotest.js
+player_data.json
 
 src/static/createQueueMessage.ts
