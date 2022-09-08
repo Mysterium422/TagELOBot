@@ -6,18 +6,10 @@ import * as games from "../handlers/game"
 import * as queueMessage from "../handlers/queueMessage"
 
 export default {
-	run: async ({ message }: CommandParameters) => {
-		if (
-			message.channel.id != config.mainChannelID &&
-			message.channel.id != config.queueChannelID &&
-			message.channel.id != config.commandsChannelID
-		) {
-			return
-		}
-
+	run: async ({ message, client }: CommandParameters) => {
 		if (!message.member) throw new Error("Message member missing")
 		if (!hasStaffPermission(message.member, Staff.STAFF)) return
-		if (!(message.channel instanceof TextChannel)) throw new Error("")
+		if (!(message.channel instanceof TextChannel)) throw new Error("Not a txt channel")
 		if (!message.channel.name.startsWith("game-")) return
 
 		if (!message.mentions.members || message.mentions.members.size == 0) {
@@ -53,16 +45,22 @@ export default {
 			})
 		}
 
-		let result = await games.executeGame(pingedID)
+		if (
+			games.findGame(pingedID)?.match != games.getMatchFromString(message.channel.name)
+		) {
+			return message.channel.send({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("NOT_QUITE_BLACK")
+						.setDescription("Incorrect Channel?")
+				]
+			})
+		}
+
+		await games.executeGame(pingedID)
+		await queueMessage.updateMessage(client)
 
 		addAudit(`${message.author.id} resolved ${pingedID}'s game Game Over!`)
 		return message.channel.delete()
-		return message.channel.send({
-			embeds: [
-				new Discord.MessageEmbed().setColor("BLUE").setDescription(`**Game Results**
-Winner: <@!${result.winner.userID}> (${result.winner.oldElo} --> ${result.winner.newElo})
-Loser: <@!${result.loser.userID}> (${result.loser.oldElo} --> ${result.loser.newElo})`)
-			]
-		})
 	}
 }

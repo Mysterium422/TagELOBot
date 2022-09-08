@@ -100,7 +100,7 @@ export default {
 				]
 			})
 		}
-		return message.channel.send("https://www.tagfeuds.club/leaderboard")
+		return message.channel.send("https://tagfeuds.herokuapp.com/leaderboard")
 	},
 	aliases: ["lb"]
 }

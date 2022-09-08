@@ -153,7 +153,7 @@ export default {
 
 		let recentGamesTogether = challenger.records
 			.filter((record) => {
-				if (record.reason == "admin") return false
+				if (record.reason == "admin" || record.reason == "game") return false
 				if (record.opponent != pingedMemberID) return false
 				return Date.now() - record.time < 24 * 60 * 60 * 1000
 			})
@@ -166,7 +166,7 @@ export default {
 				embeds: [
 					new Discord.MessageEmbed().setColor("NOT_QUITE_BLACK").setDescription(
 						`You cannot duel the same person more than 3 times within 24 hours
-Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
+Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}>`
 					)
 				]
 			})
@@ -233,7 +233,7 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}`
 					)
 				}
 
-				games.newGame(message.author.id, pingedMemberID, match)
+				games.newDuel(message.author.id, pingedMemberID, match)
 
 				await queueMessage.updateMessage(client)
 

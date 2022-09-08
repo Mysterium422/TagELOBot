@@ -67,6 +67,27 @@ function newGame(userID1: string, userID2: string, match: number) {
 	}
 }
 
+export function newDuel(userID1: string, userID2: string, match: number) {
+	if (
+		games.some((entry) => {
+			return inGame(userID1) || inGame(userID2)
+		})
+	) {
+		throw new Error("Player is already in a game")
+	}
+
+	let game = new Game(userID1, userID2, "duel", match)
+	games.push(game)
+
+	if (queue.inQueue(userID1)) {
+		queue.leave(userID1)
+	}
+
+	if (queue.inQueue(userID2)) {
+		queue.leave(userID2)
+	}
+}
+
 function findGame(playerID: string): Game | null {
 	for (let i = 0; i < games.length; i++) {
 		if (games[i].player1.userID == playerID) return games[i]
@@ -118,8 +139,8 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 	if (!winner) throw new Error("Winner Mongo Data not found")
 	if (!loser) throw new Error("Loser Mongo Data not found")
 
-	let winnerRating = winner.elo
-	let loserRating = loser.elo
+	let winnerRating = Math.round(winner.elo)
+	let loserRating = Math.round(loser.elo)
 
 	let expectedWinner = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 800))
 
@@ -129,8 +150,8 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 	}
 	ratingChange = Math.round(ratingChange * 100) / 100
 
-	let winnerNewRating = Math.max(winnerRating + ratingChange, 0)
-	let loserNewRating = Math.max(loserRating - ratingChange, 0)
+	let winnerNewRating = Math.round(Math.max(winnerRating + ratingChange, 0))
+	let loserNewRating = Math.round(Math.max(loserRating - ratingChange, 0))
 	let time = Date.now()
 
 	let winnerRecord = {
