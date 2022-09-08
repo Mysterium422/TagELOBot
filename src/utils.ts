@@ -5,7 +5,7 @@ import { resolve } from "path"
 import fetch from "node-fetch"
 
 const AUDIT_PATH = resolve(__dirname, "../audit.txt")
-const PLAYER_DATA_PATH = resolve(__dirname, "../player_data")
+const PLAYER_DATA_PATH = resolve(__dirname, "../player_data.json")
 const player_data = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH, "utf-8"))
 
 let mojangQueries = 0
