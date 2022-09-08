@@ -43,11 +43,11 @@ client.on("ready", async () => {
 
 	consolelog("[START] Loading Commands")
 	try {
-		const file_path = resolve(__dirname, "./Commands")
+		const file_path = resolve(__dirname, "./commands")
 		const commandFiles = readdirSync(file_path).filter((file) => file.endsWith(".js"))
 
 		for (const fileName of commandFiles) {
-			const command = (await import("./Commands/" + fileName)).default
+			const command = (await import("./commands/" + fileName)).default
 			Commands[fileName.slice(0, -3)] = command
 			if (command.aliases) {
 				command.aliases.forEach((name) => {
