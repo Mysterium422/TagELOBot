@@ -28,6 +28,7 @@ export default {
 				content: "Ping the player you are trying to blacklist"
 			})
 		}
+		await first.roles.add(config.blacklistRoleID)
 
 		addAudit(`${message.author.id} blacklisted ${first.id}`)
 		let blacklisted = await mongo.findOne(mongo.MODELS.Users, { userID: first.id })
@@ -43,5 +44,6 @@ export default {
 		addAudit(`Blacklisted data: ${JSON.stringify(blacklisted)}`)
 		await db.update(db.TABLES.UserData, { discord: first.id }, { blacklisted: true })
 		return message.channel.send(`Blacklisted <@!${first.id}>`)
-	}
+	},
+	aliases: ["rb", "rankedblacklist"]
 }

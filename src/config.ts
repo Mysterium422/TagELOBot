@@ -25,6 +25,7 @@ const config = JSON.parse(readFileSync(CONFIG_PATH, "utf-8")) as {
 	readonly mutedRoleID: string
 	readonly k: number
 	readonly queueMessageID: string
+	readonly blacklistRoleID: string
 }
 
 export default config
