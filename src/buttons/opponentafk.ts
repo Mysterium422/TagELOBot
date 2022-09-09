@@ -70,7 +70,7 @@ export default {
 		})
 
 		collector.on("end", async (collection, reason) => {
-			msg.reactions.removeAll()
+			await msg.reactions.removeAll()
 			if (reason == "NOTAFK") {
 				if (!(button.message instanceof Discord.Message)) {
 					throw new Error("Button message is not a Message")
@@ -106,7 +106,7 @@ export default {
 			})
 
 			collector2.on("end", async (collection, reason) => {
-				msg2.reactions.removeAll()
+				await msg2.reactions.removeAll()
 				if (!(button.message instanceof Discord.Message)) {
 					throw new Error("Button message is not a Message")
 				}
@@ -134,7 +134,7 @@ export default {
 					]
 				})
 
-				msg3.react("✅")
+				await msg3.react("✅")
 
 				const collector3 = msg3.createReactionCollector({ time: 180 * 1000, filter })
 
