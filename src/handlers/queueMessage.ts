@@ -8,21 +8,18 @@ import config from "../config"
 export async function generateMessage(): Promise<Discord.MessageEditOptions> {
 	return {
 		embeds: [
-			new Discord.MessageEmbed()
-				.setTitle("Queue")
-				.setColor("BLUE")
-				.setDescription(
-					`There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
+			new Discord.MessageEmbed().setColor("BLUE").addFields(
+				{
+					name: "Queue",
+					value: `There ${queue.queueSize() != 1 ? "are" : "is"} ${queue.queueSize()} ${
 						queue.queueSize() != 1 ? "players" : "player"
-					} in the queue.
-
-__**Current Games**__
-${await games.generateCurrentGamesString()}
-
-__**Recent Games**__
-${games.recentGames.length == 0 ? "None" : ""}`
-				)
-				.addFields(games.generateRecentGames())
+					} in the queue.\n\n**Current Games**
+						${await games.generateCurrentGamesString()}`,
+					inline: true
+				},
+				{ name: "_ _", value: "_ _", inline: true },
+				{ name: "Recent Games", value: games.generateRecentGames(), inline: true }
+			)
 		],
 		components: [new MessageActionRow().addComponents(queue_join.data, queue_leave.data)]
 	}

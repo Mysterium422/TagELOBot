@@ -60,9 +60,9 @@ export default {
 
 		addAudit(`${button.member.id} scanned ${accused}`)
 
-		await button.channel.permissionOverwrites.create(config.scanRoleID, {
-			VIEW_CHANNEL: true
-		})
+		// await button.channel.permissionOverwrites.create(config.scanRoleID, {
+		// 	VIEW_CHANNEL: true
+		// })
 
 		let msg = await button.channel.send({
 			embeds: [
@@ -80,7 +80,7 @@ export default {
 
 		await thread.send({
 			content: `**<@!${button.member.id}> has requested a scan for <@!${accused}>!**
-<@!${accused}> please do not log off Hypixel. If you do so, you'll receive a **Red Card**.
+<@!${accused}> please do not log off Hypixel. If you do so, you'll receive a **Ranked Blacklist**.
 <@!${button.member.id}> please stay online to ensure <@!${accused}> does not log off Hypixel. If they do, send a screenshot of it here.
 Neither of you should queue until directed by staff.
 If a <@&${config.scannerRoleID}> hasn't responded within 15 minutes, you may both leave the server and freely queue`

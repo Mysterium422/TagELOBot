@@ -238,20 +238,19 @@ export async function generateCurrentGamesString(): Promise<string> {
 	return string
 }
 
-export function generateRecentGames(): Discord.EmbedFieldData[] {
-	let data: EmbedFieldData[] = []
-	for (let i = 0; i < recentGames.length; i++) {
-		let recentGame = recentGames[i]
+export function generateRecentGames(): string {
+	if (recentGames.length == 0) return "None found"
+	let reversedGames = recentGames.reverse()
+	let string = ""
+	for (let i = 0; i < Math.min(recentGames.length, 3); i++) {
+		let recentGame = reversedGames[i]
 		let winner = recentGame.game.winner
 		let loser = recentGame.game.loser
-		data.push({
-			name: `Match ${recentGame.match}`,
-			value: `Winner: <@!${winner.userID}> ${winner.oldElo} --> ${winner.newElo}
-Loser: <@!${loser.userID}> ${loser.oldElo} --> ${loser.newElo}`,
-			inline: false
-		})
+		string = `${string}\nMatch ${recentGame.match}
+Winner: <@!${winner.userID}> ${winner.oldElo} --> ${winner.newElo}
+Loser: <@!${loser.userID}> ${loser.oldElo} --> ${loser.newElo}\n`
 	}
-	return data
+	return string
 }
 
 export function getMatchFromString(string: string): number {
