@@ -10,7 +10,7 @@ import { ThreadAutoArchiveDuration } from "discord-api-types/v9"
 
 export default {
 	run: async ({ button }: ButtonParameters) => {
-		// args are: host
+		let args = button.customId.split("-")
 
 		// None of these errors should fire since buttons can only be in the Guild
 		if (!button.member) throw new Error("Button Member undefined")
@@ -28,21 +28,39 @@ export default {
 
 		await button.deferUpdate()
 
-		if (
-			games.findGame(button.member.id)?.match !=
-			games.getMatchFromString(button.channel.name)
-		) {
-			return
+		if (!button.member.roles.cache.has(config.scannerRoleID)) {
+			if (Date.now() - button.message.createdAt.getTime() < 1 * 60 * 1000) {
+				return button.reply({
+					embeds: [
+						new Discord.MessageEmbed()
+							.setDescription(
+								"This is only available after a scan has been active for 15+ mins"
+							)
+							.setColor("NOT_QUITE_BLACK")
+					],
+					ephemeral: true
+				})
+			}
 		}
 
-		button.message.components[2].components[1].setDisabled(true)
+		const msg = await button.channel.messages.fetch(args[1])
 
-		await button.message.edit({
-			content: button.message.content,
-			embeds: button.message.embeds,
-			components: button.message.components
+		msg.components[0].components[0].setDisabled(false)
+		msg.components[0].components[1].setDisabled(false)
+		msg.components[1].components[0].setDisabled(false)
+		msg.components[1].components[1].setDisabled(false)
+		msg.components[2].components[0].setDisabled(false)
+
+		await msg.edit({
+			content: msg.content,
+			embeds: msg.embeds,
+			components: msg.components
 		})
 
-		button.channel.send(`<@&${config.staffRoleID}> has been requested`)
+		if (button.message.hasThread) {
+			await button.message.thread?.delete()
+		}
+
+		await button.message.delete()
 	}
 }

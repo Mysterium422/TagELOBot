@@ -70,6 +70,14 @@ export default {
 					.setColor("BLUE")
 					.setTitle("Scan Chat")
 					.setDescription("Use this thread to discuss the scan request")
+			],
+			components: [
+				new Discord.MessageActionRow().addComponents(
+					new Discord.MessageButton()
+						.setLabel("End Scan")
+						.setCustomId(`end_scan-${button.message.id}`)
+						.setStyle("PRIMARY")
+				)
 			]
 		})
 

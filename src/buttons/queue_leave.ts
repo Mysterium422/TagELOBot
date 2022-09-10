@@ -49,7 +49,7 @@ export default {
 		queue.leave(button.member.id)
 
 		await queueMessage.updateMessage(client)
-		button.reply({
+		await button.reply({
 			embeds: [
 				new Discord.MessageEmbed()
 					.setColor("RED")

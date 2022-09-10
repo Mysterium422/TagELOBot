@@ -154,6 +154,25 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 	let loserNewRating = Math.round(Math.max(loserRating - ratingChange, 0))
 	let time = Date.now()
 
+	if (game.type == "game") {
+		if (Math.max(winnerRating, loserRating) < 1300) {
+			winnerNewRating += 1
+			loserNewRating += 1
+		}
+		if (Math.max(winnerRating, loserRating) < 1100) {
+			winnerNewRating += 1
+			loserNewRating += 1
+		}
+		if (Math.max(winnerRating, loserRating) < 800) {
+			winnerNewRating += 1
+			loserRating += 1
+		}
+	}
+
+	if (loserNewRating > loserRating) {
+		loserNewRating = loserRating
+	}
+
 	let winnerRecord = {
 		reason: game.type,
 		opponent: loserID,

@@ -101,7 +101,7 @@ export default {
 					embeds: [
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription("Game abortion rejected. You may have to =resign")
+							.setDescription("Game abortion rejected. You may have to take a loss")
 					]
 				})
 			}

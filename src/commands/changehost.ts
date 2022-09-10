@@ -72,9 +72,7 @@ export default {
 			embeds: [
 				new Discord.MessageEmbed()
 					.setColor("GREEN")
-					.setDescription(
-						`Changed <@!${changeID}>'s hosting score to ${hostRows[0].host + hostChange}`
-					)
+					.setDescription(`Changed <@!${changeID}>'s hosting score by ${hostChange}`)
 			]
 		})
 	}

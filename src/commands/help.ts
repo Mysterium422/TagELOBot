@@ -4,6 +4,7 @@ import config from "../config"
 
 export default {
 	run: async ({ message }: CommandParameters) => {
+		return
 		if (
 			message.channel.id != config.mainChannelID &&
 			message.channel.id != config.queueChannelID

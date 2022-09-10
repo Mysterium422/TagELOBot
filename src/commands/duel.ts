@@ -68,11 +68,7 @@ export default {
 						.setDescription(
 							`You are in a game against <@!${games.findOpponent(
 								message.author.id
-							)}>. If you can't make it you must either forfeit (do ${
-								config.prefix
-							}forfeit <@!${games.findOpponent(message.author.id)}>) or abort (do ${
-								config.prefix
-							}abort)`
+							)}>. If you can't make it you must either do I Lost or Abort in your game's channel`
 						)
 				]
 			})
