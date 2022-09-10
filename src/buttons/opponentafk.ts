@@ -143,7 +143,7 @@ export default {
 				})
 
 				collector3.on("end", async (collection, reason) => {
-					msg3.reactions.removeAll()
+					await msg3.reactions.removeAll()
 					if (reason == "NOTAFK") {
 						if (!(button.message instanceof Discord.Message)) {
 							throw new Error("Button message is not a Message")

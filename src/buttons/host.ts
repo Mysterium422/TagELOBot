@@ -85,7 +85,7 @@ export default {
 			if (!(button.member instanceof Discord.GuildMember)) {
 				throw new Error("Button member is not a GuildMember")
 			}
-			if (!button.channel) throw new Error("Button Channel null")
+			if (!button.channel) return
 			if (!(button.channel instanceof TextChannel)) {
 				throw new Error("Commands Channel not Text Channel")
 			}
@@ -111,9 +111,9 @@ export default {
 			collector.stop("reaction")
 		})
 
-		collector.on("end", (collection, reason) => {
+		collector.on("end", async (collection, reason) => {
 			if (reason == "reaction") return
-			msg.reactions.removeAll()
+			await msg.reactions.removeAll()
 			msg.edit("Host Request Timed Out")
 		})
 	}

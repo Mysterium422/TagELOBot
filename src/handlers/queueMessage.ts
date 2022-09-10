@@ -4,6 +4,7 @@ import Discord, { MessageActionRow } from "discord.js"
 import queue_join from "../buttons/queue_join"
 import queue_leave from "../buttons/queue_leave"
 import config from "../config"
+import { locked } from "../utils"
 
 export async function generateMessage(): Promise<Discord.MessageEditOptions> {
 	return {
@@ -21,7 +22,12 @@ ${await games.generateCurrentGamesString()}`,
 				{ name: "Recent Games", value: games.generateRecentGames(), inline: true }
 			)
 		],
-		components: [new MessageActionRow().addComponents(queue_join.data, queue_leave.data)]
+		components: [
+			new MessageActionRow().addComponents(
+				queue_join.data.setDisabled(locked),
+				queue_leave.data.setDisabled(locked)
+			)
+		]
 	}
 }
 

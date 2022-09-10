@@ -72,9 +72,7 @@ export default {
 			}
 		})
 
-		collector.on("end", (collection, reason) => {
-			msg.reactions.removeAll()
-
+		collector.on("end", async (collection, reason) => {
 			if (!(button.message instanceof Discord.Message)) {
 				throw new Error("Button message is not a Message")
 			}

@@ -85,7 +85,6 @@ export default {
 		})
 
 		collector.on("end", async (collection, reason) => {
-			msg.reactions.removeAll()
 			if (!button.member) throw new Error("Button Member undefined")
 			if (!(button.message instanceof Discord.Message)) {
 				throw new Error("Button message is not a Message")
