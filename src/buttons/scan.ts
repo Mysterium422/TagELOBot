@@ -64,6 +64,11 @@ export default {
 		// 	VIEW_CHANNEL: true
 		// })
 
+		await button.channel.permissionOverwrites.create(config.scannerRoleID, {
+			VIEW_CHANNEL: true,
+			USE_PUBLIC_THREADS: true
+		})
+
 		let msg = await button.channel.send({
 			embeds: [
 				new Discord.MessageEmbed()
