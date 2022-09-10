@@ -78,6 +78,7 @@ export default {
 			return button.channel.send({
 				content: `<@!${args[2]}>`,
 				embeds: [
+					button.message.embeds[0],
 					new Discord.MessageEmbed()
 						.setColor("GREEN")
 						.setDescription(`Verified <@!${args[2]}>`)
@@ -89,6 +90,7 @@ export default {
 			return button.channel.send({
 				content: `<@!${args[2]}>`,
 				embeds: [
+					button.message.embeds[0],
 					new Discord.MessageEmbed()
 						.setColor("RED")
 						.setDescription(`Staff has denied your verification request`)
