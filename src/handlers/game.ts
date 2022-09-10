@@ -216,7 +216,7 @@ async function executeGame(winnerID: string): Promise<executeGameReturn> {
 		}
 	}
 
-	if (recentGames.length > 4) recentGames.shift()
+	if (recentGames.length > 2) recentGames.shift()
 	recentGames.push(endedGame)
 
 	return {
@@ -259,7 +259,7 @@ export async function generateCurrentGamesString(): Promise<string> {
 
 export function generateRecentGames(): string {
 	if (recentGames.length == 0) return "None found"
-	let reversedGames = recentGames.reverse()
+	let reversedGames = recentGames
 	let string = ""
 	for (let i = 0; i < Math.min(recentGames.length, 3); i++) {
 		let recentGame = reversedGames[i]

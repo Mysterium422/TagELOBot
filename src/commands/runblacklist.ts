@@ -43,7 +43,7 @@ export default {
 		await mongo.findOneAndReplace(mongo.MODELS.Users, { userID: first.id }, blacklisted)
 
 		await db.update(db.TABLES.UserData, { discord: first.id }, { blacklisted: false })
-		return message.channel.send(`Blacklisted <@!${first.id}>`)
+		return message.channel.send(`Unblacklisted <@!${first.id}>`)
 	},
 	aliases: ["runb", "rankedunblacklist"]
 }

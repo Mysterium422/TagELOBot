@@ -96,7 +96,7 @@ export default {
 		let matchesRows = await db.where(db.TABLES.Matches, { channel: button.channel.id })
 		let match = 1
 		if (matchesRows.length == 0) {
-			await db.add(db.TABLES.Matches, { channel: button.channel.id, matches: 0 })
+			await db.add(db.TABLES.Matches, { channel: button.channel.id, matches: 1 })
 		} else {
 			match = matchesRows[0].matches + 1
 			await db.update(

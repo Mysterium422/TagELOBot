@@ -105,7 +105,7 @@ export function addAudit(text: string) {
 	let auditLog = fs.readFileSync(AUDIT_PATH, "utf-8")
 	// 17 Aug 2015 14:05:30 >>
 	auditLog = `${auditLog}\n${timeConverter(Date.now())} >> ${text}`
-	fs.writeFileSync("audit.txt", auditLog)
+	fs.writeFileSync(AUDIT_PATH, auditLog)
 }
 
 export type HypixelResponsePlayerData = {

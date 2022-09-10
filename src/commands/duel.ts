@@ -28,7 +28,7 @@ export default {
 					embeds: [
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription(`That command goes in <#${config.queueChannelID}>`)
+							.setDescription(`That command goes in <#${config.commandsChannelID}>`)
 					]
 				})
 				.catch((err) =>
@@ -36,7 +36,7 @@ export default {
 						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription(`That command goes in <#${config.queueChannelID}>`),
+							.setDescription(`That command goes in <#${config.commandsChannelID}>`),
 						client
 					)
 				)
@@ -82,9 +82,7 @@ export default {
 					new Discord.MessageEmbed()
 						.setColor("NOT_QUITE_BLACK")
 						.setDescription(
-							`You are in a game against <@!${games.findOpponent(
-								message.author.id
-							)}>. If you can't make it you must either do I Lost or Abort in your game's channel`
+							`You are in a game against <@!${games.findOpponent(message.author.id)}>.`
 						)
 				]
 			})
@@ -108,6 +106,7 @@ export default {
 				]
 			})
 		}
+
 		let first = message.mentions.members.first()
 		if (!first) {
 			return message.channel.send({
@@ -118,6 +117,7 @@ export default {
 				]
 			})
 		}
+
 		let pingedMemberID = first.id
 		addAudit(`${message.author.id} tried to duel ${pingedMemberID}`)
 
@@ -230,7 +230,7 @@ Next available duel: <t:${Math.round(recentGamesTogether[0].time / 1000)}>`
 		})
 
 		collector.on("end", async (collection, reason) => {
-			msg.reactions.removeAll()
+			await msg.reactions.removeAll()
 			if (reason == "success") {
 				if (
 					games.inGame(message.author.id) ||

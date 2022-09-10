@@ -25,7 +25,7 @@ export default {
 					.setDescription(
 						`Check out <#844559642490830889> for Ranked info${
 							hasStaffPermission(message.member, Staff.STAFF)
-								? "\nCheck out <#859417093483790386> for Ranked info"
+								? "\nCheck out <#859417093483790386> for Ranked Staff info"
 								: ""
 						}`
 					)
