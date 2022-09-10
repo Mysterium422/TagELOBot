@@ -24,11 +24,7 @@ export default {
 						.setDescription(
 							`You are in a game against <@!${games.findOpponent(
 								button.member.id
-							)}>. If you can't make it you must either forfeit (do ${
-								config.prefix
-							}forfeit <@!${games.findOpponent(button.member.id)}>) or abort (do ${
-								config.prefix
-							}abort)`
+							)}>. If you can't make it you must either hit the I Lose or Abort buttons`
 						)
 				],
 				ephemeral: true

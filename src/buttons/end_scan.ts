@@ -26,8 +26,6 @@ export default {
 			throw new Error("Button channel is not a Text CHannel")
 		}
 
-		await button.deferUpdate()
-
 		if (!button.member.roles.cache.has(config.scannerRoleID)) {
 			if (Date.now() - button.message.createdAt.getTime() < 15 * 60 * 1000) {
 				return button.reply({
@@ -45,6 +43,7 @@ export default {
 			}
 		}
 
+		await button.deferUpdate()
 		const msg = await button.channel.messages.fetch(args[1])
 
 		msg.components[0].components[0].setDisabled(false)
