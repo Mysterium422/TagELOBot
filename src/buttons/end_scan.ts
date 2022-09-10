@@ -29,12 +29,14 @@ export default {
 		await button.deferUpdate()
 
 		if (!button.member.roles.cache.has(config.scannerRoleID)) {
-			if (Date.now() - button.message.createdAt.getTime() < 1 * 60 * 1000) {
+			if (Date.now() - button.message.createdAt.getTime() < 15 * 60 * 1000) {
 				return button.reply({
 					embeds: [
 						new Discord.MessageEmbed()
 							.setDescription(
-								"This is only available after a scan has been active for 15+ mins"
+								`This is only available after a scan has been inactive till <t:${
+									Math.floor(button.message.createdAt.getTime() / 1000) + 15 * 60
+								}>`
 							)
 							.setColor("NOT_QUITE_BLACK")
 					],
