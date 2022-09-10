@@ -9,12 +9,13 @@ export default {
 		if (
 			message.channel.id != config.mainChannelID &&
 			message.channel.id != config.queueChannelID &&
-			message.channel.id != config.commandsChannelID
+			message.channel.id != config.commandsChannelID &&
+			message.channel.id != config.registerChannelID
 		) {
 			return
 		}
 
-		if (message.channel.id != config.mainChannelID) {
+		if (message.channel.id != config.registerChannelID) {
 			setTimeout(async function () {
 				message.delete()
 			}, 200)
@@ -23,7 +24,7 @@ export default {
 					embeds: [
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription(`That command goes in <#${config.mainChannelID}>`)
+							.setDescription(`That command goes in <#${config.registerChannelID}>`)
 					]
 				})
 				.catch((err) =>
@@ -31,7 +32,7 @@ export default {
 						message.member,
 						new Discord.MessageEmbed()
 							.setColor("NOT_QUITE_BLACK")
-							.setDescription(`That command goes in <#${config.mainChannelID}>`),
+							.setDescription(`That command goes in <#${config.registerChannelID}>`),
 						client
 					)
 				)
