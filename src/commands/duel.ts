@@ -51,7 +51,12 @@ export default {
 				]
 			})
 		}
-		if (!(await db.contains(db.TABLES.UserData, { discord: message.author.id }))) {
+
+		let userData: db.UserRow[] = await db.where(db.TABLES.UserData, {
+			discord: message.author.id
+		})
+
+		if (userData.length == 0) {
 			return message.channel.send({
 				embeds: [
 					new Discord.MessageEmbed()
@@ -60,6 +65,17 @@ export default {
 				]
 			})
 		}
+
+		if (userData[0].blacklisted) {
+			return message.channel.send({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("NOT_QUITE_BLACK")
+						.setDescription("You have been blacklisted and can no longer join games")
+				]
+			})
+		}
+
 		if (games.inGame(message.author.id))
 			return message.channel.send({
 				embeds: [
@@ -104,7 +120,12 @@ export default {
 		}
 		let pingedMemberID = first.id
 		addAudit(`${message.author.id} tried to duel ${pingedMemberID}`)
-		if (!(await db.contains(db.TABLES.UserData, { discord: pingedMemberID }))) {
+
+		let pingedData: db.UserRow[] = await db.where(db.TABLES.UserData, {
+			discord: pingedMemberID
+		})
+
+		if (pingedData.length == 0) {
 			return message.channel.send({
 				embeds: [
 					new Discord.MessageEmbed()
@@ -113,6 +134,19 @@ export default {
 				]
 			})
 		}
+
+		if (pingedData[0].blacklisted) {
+			return message.channel.send({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("NOT_QUITE_BLACK")
+						.setDescription(
+							"That player has been blacklisted and can no longer join games"
+						)
+				]
+			})
+		}
+
 		if (pingedMemberID == message.author.id) {
 			return message.channel.send({
 				embeds: [

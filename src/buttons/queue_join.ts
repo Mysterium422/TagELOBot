@@ -23,21 +23,6 @@ export default {
 
 		addAudit(`${button.member} tried to join`)
 
-		/** Lock using button#setDisabled? */
-
-		// if (locked) {
-		// 	return message.channel.send({
-		// 		embeds: [
-		// 			new Discord.MessageEmbed()
-		// 				.setColor("NOT_QUITE_BLACK")
-		// 				.setDescription("The queue has been locked and games can no longer start")
-		// 		]
-		// 	})
-		// }
-		// setTimeout(async function () {
-		// 	message.delete()
-		// }, 200)
-
 		if (queue.inQueue(button.member.id)) {
 			return button.reply({
 				embeds: [
@@ -60,8 +45,11 @@ export default {
 				ephemeral: true
 			})
 		}
+		let userData: db.UserRow[] = await db.where(db.TABLES.UserData, {
+			discord: button.member.id
+		})
 
-		if (!(await db.contains(db.TABLES.UserData, { discord: button.member.id }))) {
+		if (userData.length == 0) {
 			return button.reply({
 				embeds: [
 					new Discord.MessageEmbed()
@@ -69,6 +57,17 @@ export default {
 						.setDescription(
 							"You must be verified first. Do =register to start the verification process"
 						)
+				],
+				ephemeral: true
+			})
+		}
+
+		if (userData[0].blacklisted) {
+			return button.reply({
+				embeds: [
+					new Discord.MessageEmbed()
+						.setColor("NOT_QUITE_BLACK")
+						.setDescription("You have been blacklisted and can no longer join games")
 				],
 				ephemeral: true
 			})
